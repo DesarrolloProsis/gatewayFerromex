@@ -21,6 +21,7 @@ using System.Text;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using Microsoft.AspNetCore.Identity;
 using Hellang.Middleware.ProblemDetails.Mvc;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,10 @@ var openApiInfo = new OpenApiInfo()
     Title = "API Gateway",
     Description = ""
 };
+var certificate = new X509Certificate2(
+    "cert.pfx",
+    "12345"
+);
 
 builder.Services.AddProblemDetails(setup =>
 {
@@ -149,8 +154,9 @@ builder.Services.AddOpenIddict()
             // Encryption and signing of tokens
             options
                 //.AddEphemeralEncryptionKey()
-                .AddDevelopmentEncryptionCertificate()
-                .AddDevelopmentSigningCertificate()
+                .AddEncryptionCertificate(certificate)
+                .AddSigningCertificate(certificate)
+                //.AddDevelopmentSigningCertificate()
                 .DisableAccessTokenEncryption()
                 .AddSigningKey(key);
 
@@ -168,11 +174,13 @@ builder.Services.AddOpenIddict()
         })
         .AddValidation(options =>
         {
+            options.UseLocalServer();
             options.Configure(o => o.TokenValidationParameters.IssuerSigningKey = key);
         });
 
 
-builder.Services.AddLogging(loggingBuilder => {
+builder.Services.AddLogging(loggingBuilder =>
+{
     var loggingSection = builder.Configuration.GetSection("Logging");
     loggingBuilder.AddFile(loggingSection);
 });
