@@ -1,13 +1,6 @@
-﻿using ApiGateway.Data;
-using ApiGateway.Models;
-using ApiGateway.Extensions;
-using ApiGateway.Helpers;
+﻿using ApiGateway.Models;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
@@ -17,7 +10,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace ApiGateway.Services
 {
@@ -26,23 +18,14 @@ namespace ApiGateway.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly IOpenIddictApplicationManager _applicationManager;
-        private readonly IOpenIddictAuthorizationManager _authorizationManager;
-        private readonly IOpenIddictScopeManager _scopeManager;
 
         public UserLoginEventHandler(SignInManager<ApplicationUser> signInManager,
                                      UserManager<ApplicationUser> userManager,
-                                     IConfiguration configuration,
-                                     IOpenIddictApplicationManager applicationManager,
-                                     IOpenIddictAuthorizationManager authorizationManager,
-                                     IOpenIddictScopeManager scopeManager)
+                                     IConfiguration configuration)
         {
             _signInManager = signInManager;
             _configuration = configuration;
             _userManager = userManager;
-            _applicationManager = applicationManager;
-            _authorizationManager = authorizationManager;
-            _scopeManager = scopeManager;
         }
 
         public async Task<IdentityAccess> Handle(UserLoginCommand loginCommand, CancellationToken cancellationToken)
@@ -52,14 +35,14 @@ namespace ApiGateway.Services
                 Succeeded = false
             };
 
-            if (loginCommand.Email == null && loginCommand.UserName == null)
+            if (loginCommand.UserName == null)
             {
                 result.Error = "invalid_request";
-                result.ErrorDescription = "email/user_name requerido";
+                result.ErrorDescription = "usuario invalido";
                 return result;
             }
             ApplicationUser? user = null;
-            if (loginCommand.Email != null) user = await _userManager.FindByEmailAsync(loginCommand.Email);
+            if (loginCommand.UserName != null) user = await _userManager.FindByEmailAsync(loginCommand.UserName);
             if (loginCommand.UserName != null && user == null) user = await _userManager.FindByNameAsync(loginCommand.UserName);
             if (user == null)
             {
@@ -86,43 +69,26 @@ namespace ApiGateway.Services
             }
 
             result.Succeeded = true;
-            result.Claims = GetClaimsPrincipal(user);
             result.User = user;
-            //GenerateJwtToken(user, result);
-            //GenerateRefreshToken(user, result);
-            await _userManager.UpdateAsync(user);
+            //result.Scope = loginCommand.Scope;
+            if (!loginCommand.IsRfc6749)
+            {
+                result.ClaimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+                CreateJwtToken(user, result);
+                if(loginCommand.Scope == "offline_access") CreateRefreshToken(user, result);
+                await _userManager.UpdateAsync(user);
+            }
             return result;
         }
 
-        private ClaimsPrincipal GetClaimsPrincipal(ApplicationUser user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim (ClaimTypes.NameIdentifier, user.Id),
-                new Claim (ClaimTypes.Email, user.NormalizedEmail),
-                new Claim (ClaimTypes.Name, user.NormalizedUserName),
-                new Claim(Claims.Subject, user.Id),
-            };
-
-            var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-           return new ClaimsPrincipal(claimsIdentity);
-        }
-
-        private void GenerateJwtToken(ApplicationUser user, IdentityAccess identity)
+        private void CreateJwtToken(ApplicationUser user, IdentityAccess identity)
         {
             var secretKey = _configuration.GetValue<string>("SecretKey");
             var key = Encoding.ASCII.GetBytes(secretKey);
-            var claims = new List<Claim>
-            {
-                new Claim (ClaimTypes.NameIdentifier, user.Id),
-                new Claim (ClaimTypes.Email, user.NormalizedEmail),
-                new Claim (ClaimTypes.Name, user.NormalizedUserName),
-                new Claim(Claims.Subject, user.Id),
-            };
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(claims),
+                Subject = new ClaimsIdentity(identity.ClaimsPrincipal?.Claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
@@ -136,10 +102,10 @@ namespace ApiGateway.Services
             identity.AccessToken = tokenHandler.WriteToken(createdToken);
         }
 
-        private static void GenerateRefreshToken(ApplicationUser user, IdentityAccess identity)
+        private static void CreateRefreshToken(ApplicationUser user, IdentityAccess identity)
         {
             using var rngCryptoServiceProvider = RandomNumberGenerator.Create();
-            var randomBytes = new byte[64];
+            var randomBytes = new byte[512];
             rngCryptoServiceProvider.GetBytes(randomBytes);
             var refreshToken = Convert.ToBase64String(randomBytes);
 
@@ -151,25 +117,24 @@ namespace ApiGateway.Services
 
     public class UserLoginCommand : IRequest<IdentityAccess>
     {
-        [DataType(DataType.Password)]
-        [Required(ErrorMessage = "El campo {0} es requerido.")]
-        public string? Password { get; set; }
-        [EmailAddress]
-        public string? Email { get; set; }
+        [JsonPropertyName("grant_type")]
+        public string? GrantType { get; set; }
         public string? UserName { get; set; }
+        [DataType(DataType.Password)]
+        public string? Password { get; set; }
         public string? Scope { get; set; }
+        [JsonPropertyName("client_id")]
+        public string? ClientId { get; set; }
+        [JsonPropertyName("client_secret")]
+        public string? ClientSecret { get; set; }
         [JsonIgnore]
         public string? RefreshToken { get; set; }
+        [JsonIgnore]
+        public bool IsRfc6749 { get; set; }
     }
 
     public class IdentityAccess
     {
-        [JsonIgnore]
-        public bool Succeeded { get; set; }
-
-        public ClaimsPrincipal? Claims { get; set; }
-        public ApplicationUser? User { get; set; }
-
         [JsonPropertyName("access_token")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? AccessToken { get; set; }
@@ -195,6 +160,16 @@ namespace ApiGateway.Services
         public string? ErrorDescription { get; set; }
 
         [JsonIgnore]
+        public bool Succeeded { get; set; }
+
+        [JsonIgnore]
+        public ApplicationUser? User { get; set; }
+
+        [JsonIgnore]
+        public ClaimsPrincipal? ClaimsPrincipal { get; set; }
+
+        [JsonPropertyName("refresh_token")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? RefreshToken { get; set; }
         [JsonIgnore]
         public DateTime? RefreshTokenExpiryTime { get; set; }

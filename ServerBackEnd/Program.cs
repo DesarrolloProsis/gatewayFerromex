@@ -2,26 +2,20 @@ using ApiGateway;
 using ApiGateway.Data;
 using ApiGateway.Interfaces;
 using ApiGateway.Models;
-using ApiGateway.Proxies;
 using ApiGateway.Services;
 using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using Microsoft.AspNetCore.Identity;
-using Hellang.Middleware.ProblemDetails.Mvc;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +71,7 @@ builder.Services.AddProblemDetails(setup =>
     .AddProblemDetailsConventions()
 .AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull);
 
-builder.Services.AddHttpClient("Reportes", client => client.BaseAddress = new Uri("https://localhost:7293/"));
+builder.Services.AddHttpClient("Reportes", client => client.BaseAddress = new Uri("http://localhost:7293/"));
 
 builder.Services.AddCors();
 
@@ -87,7 +81,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseOpenIddict();
 });
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
     options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireDigit = false;
     options.Password.RequireNonAlphanumeric = false;
@@ -115,7 +110,15 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
         };
+    })
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(50);
+        options.SlidingExpiration = false;
     });
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.ClaimsIdentity.UserNameClaimType = Claims.Name;
@@ -124,6 +127,14 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.ClaimsIdentity.EmailClaimType = Claims.Email;
 });
 
+builder.Services.AddQuartz(options =>
+{
+    options.UseMicrosoftDependencyInjectionJobFactory();
+    options.UseSimpleTypeLoader();
+    options.UseInMemoryStore();
+});
+builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
 builder.Services.AddOpenIddict()
 
         // Register the OpenIddict core components.
@@ -131,6 +142,8 @@ builder.Services.AddOpenIddict()
         {
             options.UseEntityFrameworkCore()
                 .UseDbContext<ApplicationDbContext>();
+
+            options.UseQuartz();
         })
 
         // Register the OpenIddict server components.
@@ -176,6 +189,7 @@ builder.Services.AddOpenIddict()
         {
             options.UseLocalServer();
             options.Configure(o => o.TokenValidationParameters.IssuerSigningKey = key);
+            options.UseAspNetCore();
         });
 
 
@@ -191,7 +205,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => {
+builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", openApiInfo);
     options.AddSecurityDefinition("Bearer", securityScheme);
     options.AddSecurityRequirement(securityRequirements);
@@ -201,6 +216,7 @@ builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
 
 builder.Services.AddHostedService<Worker>();
 builder.Services.AddScoped<IReportesService, ReportesService>();
+builder.Services.AddScoped<IFerromexService, FerromexService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -230,7 +246,7 @@ app.UseCors(x => x
 
 app.UseRouting();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 

@@ -34,7 +34,7 @@ namespace ApiGateway.Controllers
         /// <response code="201">Regresa el objeto creado</response>
         /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
-        [HttpPost("registro")]
+        [HttpPost("register")]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -51,6 +51,64 @@ namespace ApiGateway.Controllers
                 }
                 var res = await _mediator.Send(new UserFindCommand { Email = createCommand.Email });
                 return CreatedAtAction("Find", new { res.Id }, res);
+            }
+            return BadRequest();
+        }
+
+        /// <summary>
+        /// Registrar roles de usuario 
+        /// </summary>
+        /// <param name="addRolesCommand">Parametros de registro</param>
+        /// <returns>Regresa el codigo de estado.</returns>
+        /// <response code="204">Se agregaron correctamento los roles al usuario</response>
+        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
+        [HttpPost("addUserRoles")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddUserRoles(UserAddRolesCommand addRolesCommand)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(addRolesCommand);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+                return NoContent();
+            }
+            return BadRequest();
+        }
+
+        /// <summary>
+        /// Registrar roles de usuario 
+        /// </summary>
+        /// <param name="addRolesCommand">Parametros de registro</param>
+        /// <returns>Regresa el codigo de estado.</returns>
+        /// <response code="204">Se agregaron correctamento los roles al usuario</response>
+        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
+        [HttpPost("addRoles")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddRoles(AddRolesCommand addRolesCommand)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(addRolesCommand);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.Errors);
+                }
+                return NoContent();
             }
             return BadRequest();
         }
@@ -124,12 +182,13 @@ namespace ApiGateway.Controllers
             }
             else if (request.IsPasswordGrantType())
             {
-
+                
                 UserLoginCommand loginCommand = new()
                 {
                     UserName = request.Username,
                     Password = request.Password,
-                    RefreshToken = Request.Cookies["refreshToken"],
+                    IsRfc6749 = true,
+                    //RefreshToken = Request.Cookies["refreshToken"],
                 };
                 var identity = await _mediator.Send(loginCommand);
                 if (!identity.Succeeded)
@@ -181,7 +240,7 @@ namespace ApiGateway.Controllers
             UserLoginCommand loginCommand = new()
             {
                 UserName = authenticate.Principal.Identity?.Name,
-                RefreshToken = Request.Cookies["refreshToken"],
+                //RefreshToken = Request.Cookies["refreshToken"],
             };
 
             var identity = await _mediator.Send(loginCommand);
@@ -230,26 +289,33 @@ namespace ApiGateway.Controllers
         /// <response code="200">Regresa el objeto solicitado</response>
         /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
-        //[HttpPost("auth")]
-        //[Consumes("application/x-www-form-urlencoded")]
-        //[Produces("application/json", "application/problem+json")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        //public async Task<IActionResult> Login([FromForm]UserLoginCommand loginCommand)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var result = await _mediator.Send(loginCommand);
-        //        if (!result.Succeeded)
-        //        {
-        //            return BadRequest(result);
-        //        }
-        //        RefreshTokenCookie(result.RefreshToken);
-        //        return Ok(result);
-        //    }
-        //    return BadRequest();
-        //}
+        [HttpPost("login")]
+        [Consumes("application/json")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Login(UserLoginCommand loginCommand)
+        {
+            if (ModelState.IsValid)
+            {
+                if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    loginCommand.UserName = User.Identity.Name;
+                    //loginCommand.RefreshToken = Request.Cookies["refreshToken"];
+                    loginCommand.RefreshToken = loginCommand.RefreshToken;
+                }
+                var result = await _mediator.Send(loginCommand);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result);
+                }
+                //if (!string.IsNullOrEmpty(result.RefreshToken))
+                //    RefreshTokenCookie(result.RefreshToken);
+                return Ok(result);
+            }
+            return BadRequest();
+        }
 
         /// <summary>
         /// Solicitar nuevo JWT
