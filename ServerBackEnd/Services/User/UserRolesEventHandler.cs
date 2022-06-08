@@ -153,6 +153,21 @@ namespace ApiGateway.Services
         }
     }
 
+    public class GetRolesEventHandler : IRequestHandler<GetRolesCommand, List<IdentityRole>>
+    {
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public GetRolesEventHandler(RoleManager<IdentityRole> roleManager)
+        {
+            _roleManager = roleManager;
+        }
+
+        public async Task<List<IdentityRole>> Handle(GetRolesCommand getRolesCommand, CancellationToken cancellationToken)
+        {
+            return _roleManager.Roles.ToList();
+        }
+    }
+
     public class UserAddRolesCommand : IRequest<IdentityResult>
     {
         public string UserId { get; set; }
@@ -169,5 +184,9 @@ namespace ApiGateway.Services
     {
         public string? RoleName { get; set; }
         public IEnumerable<string>? RoleNames { get; set; }
+    }
+    public class GetRolesCommand : IRequest<List<IdentityRole>>
+    {
+        public string? RoleNames { get; set; }
     }
 }

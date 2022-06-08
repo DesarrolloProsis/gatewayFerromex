@@ -2,28 +2,40 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace ApiGateway.Services
 {
     public class UserRegisterEventHandler : IRequestHandler<UserCreateCommand, IdentityResult>
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserRegisterEventHandler(UserManager<ApplicationUser> userManager)
+        public UserRegisterEventHandler(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<IdentityResult> Handle(UserCreateCommand createCommand, CancellationToken cancellationToken)
         {
+            var roleExists = await _roleManager.RoleExistsAsync(createCommand.RoleName);
+            if (!roleExists)
+                return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidRoleName(createCommand.RoleName));
             var entry = new ApplicationUser
             {
-                UserName = createCommand.UserName,
-                Email = createCommand.Email
+                UserName = createCommand.Nombre.ToUpperInvariant()[..3] + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", ""),
+                Nombre = createCommand.Nombre,
+                Apellidos = createCommand.Apellidos,
             };
+            entry.Email = entry.UserName + "@mail.com";
             var res = await _userManager.CreateAsync(entry, createCommand.Password);
-            var user = await _userManager.FindByNameAsync(createCommand.UserName);
-            if(res.Succeeded) res = await _userManager.AddToRoleAsync(user, "User");
+            if (res.Succeeded)
+            {
+                var user = await _userManager.FindByNameAsync(entry.UserName);
+                res = await _userManager.AddToRoleAsync(user, createCommand.RoleName);
+            }
+
             return res;
         }
     }
@@ -32,8 +44,8 @@ namespace ApiGateway.Services
     {
         [Required]
         public string Password { get; set; }
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        public string UserName { get; set; }
+        public string Nombre { get; set; }
+        public string Apellidos { get; set; }
+        public string RoleName { get; set; }
     }
 }

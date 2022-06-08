@@ -20,11 +20,13 @@ namespace ApiGateway.Services
             ApplicationUser applicationUser = new();
             if (findCommand?.Id != null)
                 applicationUser = await _userManager.FindByIdAsync(findCommand.Id);
-            else if (findCommand?.Email != null)
-                applicationUser = await _userManager.FindByEmailAsync(findCommand.Email);
+            //else if (findCommand?.Email != null)
+            //    applicationUser = await _userManager.FindByEmailAsync(findCommand.Email);
             else if (findCommand?.Username != null)
                 applicationUser = await _userManager.FindByNameAsync(findCommand.Username);
-            return new User(applicationUser.Id, applicationUser.Email, applicationUser.UserName);
+            if (applicationUser == null)
+                return null;
+            return new User(applicationUser.Id, applicationUser.UserName);
         }
     }
 
@@ -33,10 +35,12 @@ namespace ApiGateway.Services
         public string? Id { get; set; }
         public string? Email { get; set; }
         public string? Username { get; set; }
+        public string? Nombre { get; set; }
+        public string? Apellidos { get; set; }
     }
-    public record User(string Id, string Email, string? Username)
+    public record User(string Id, string? Username)
     {
         [JsonIgnore]
-        public bool Succeeded => Id != null && Email != null;
+        public bool Succeeded => Id != null;
     }
 }

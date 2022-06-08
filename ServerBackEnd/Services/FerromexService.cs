@@ -30,7 +30,12 @@ namespace ApiGateway.Services
 
         public async Task<ApiResponse<Module>> PostModuleAsync(Module module)
         {
-            return await PostAsync<Module>(module, path: "module");
+            return await PostAsync(module, path: "module");
+        }
+
+        public async Task<ApiResponse<bool>> PostRoleModulesAsync(RoleModules roleModules)
+        {
+            return await PostAsync<bool>(roleModules, path: "modulesrole");
         }
     }
 }

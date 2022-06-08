@@ -1,4 +1,5 @@
-﻿using ApiGateway.Models;
+﻿using ApiGateway.Interfaces;
+using ApiGateway.Models;
 using ApiGateway.Services;
 using MediatR;
 using Microsoft.AspNetCore;
@@ -7,8 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Shared;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace ApiGateway.Controllers
@@ -19,11 +23,13 @@ namespace ApiGateway.Controllers
     {
         private readonly IMediator _mediator;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUsuariosService _usuariosService;
 
-        public IdentityController(IMediator mediator, SignInManager<ApplicationUser> signInManager)
+        public IdentityController(IMediator mediator, SignInManager<ApplicationUser> signInManager, IUsuariosService usuariosService)
         {
             _mediator = mediator;
             _signInManager = signInManager;
+            _usuariosService = usuariosService;
         }
 
         /// <summary>
@@ -49,7 +55,8 @@ namespace ApiGateway.Controllers
                 {
                     return BadRequest(result.Errors);
                 }
-                var res = await _mediator.Send(new UserFindCommand { Email = createCommand.Email });
+                var res = await _mediator.Send(new UserFindCommand { Username = createCommand.Nombre.ToUpperInvariant()[..3]
+                    + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", "") });
                 return CreatedAtAction("Find", new { res.Id }, res);
             }
             return BadRequest();
@@ -114,6 +121,29 @@ namespace ApiGateway.Controllers
         }
 
         /// <summary>
+        /// Registrar roles de usuario 
+        /// </summary>
+        /// <returns>Regresa el codigo de estado.</returns>
+        /// <response code="200">Se agregaron correctamento los roles al usuario</response>
+        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
+        //[HttpGet("roles")]
+        //[Produces("application/json", "application/problem+json")]
+        //[ProducesResponseType(typeof(List<IdentityRole>), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> GetRoles()
+        //{
+        //    var result = await _mediator.Send(new GetRolesCommand());
+        //    if (result == null || result?.Count < 1)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok(result);
+        //}
+
+        /// <summary>
         /// Consultar usuario
         /// </summary>
         /// <param name="id">Realizar busqueda por Id</param>
@@ -124,162 +154,162 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
         /// <response code="404">No se pudo encontrar el objeto solicitado</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
-        [HttpGet("usuario")]
-        [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Find(string? id = null, string? email = null, string? userName = null)
-        {
-            if (!string.IsNullOrEmpty(id) || !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(userName))
-            {
-                UserFindCommand findCommand = new() { Id = id, Email = email, Username = userName };
-                var result = await _mediator.Send(findCommand);
-                if (!result.Succeeded)
-                {
-                    return NotFound();
-                }
-                return Ok(result);
-            }
-            return BadRequest();
-        }
+        //[HttpGet("user")]
+        //[Produces("application/json", "application/problem+json")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> Find(string? id = null, string? email = null, string? userName = null)
+        //{
+        //    if (!string.IsNullOrEmpty(id) || !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(userName))
+        //    {
+        //        UserFindCommand findCommand = new() { Id = id, Email = email, Username = userName };
+        //        var result = await _mediator.Send(findCommand);
+        //        if (!result.Succeeded)
+        //        {
+        //            return NotFound();
+        //        }
+        //        return Ok(result);
+        //    }
+        //    return BadRequest();
+        //}
 
-        [HttpPost("token")]
-        public async Task<IActionResult> ExchangeAsync()
-        {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
-                          throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+        //[HttpPost("token")]
+        //public async Task<IActionResult> ExchangeAsync()
+        //{
+        //    var request = HttpContext.GetOpenIddictServerRequest() ??
+        //                  throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-            ClaimsPrincipal claimsPrincipal;
+        //    ClaimsPrincipal claimsPrincipal;
 
-            ForbidResult? forbidResult = new(authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        //    ForbidResult? forbidResult = new(authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-            if (request.IsClientCredentialsGrantType())
-            {
-                var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        //    if (request.IsClientCredentialsGrantType())
+        //    {
+        //        var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-                identity.AddClaim(Claims.Subject, request.ClientId ?? throw new InvalidOperationException());
+        //        identity.AddClaim(Claims.Subject, request.ClientId ?? throw new InvalidOperationException());
 
-                claimsPrincipal = new ClaimsPrincipal(identity);
+        //        claimsPrincipal = new ClaimsPrincipal(identity);
 
-                claimsPrincipal.SetScopes(request.GetScopes());
-            }
-            else if (request.IsAuthorizationCodeGrantType())
-            {
-                var authorization = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-                if (!authorization.Succeeded)
-                {
-                    forbidResult.Properties = new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = authorization.Failure?.Message
-                    });
-                    return forbidResult;
-                }
+        //        claimsPrincipal.SetScopes(request.GetScopes());
+        //    }
+        //    else if (request.IsAuthorizationCodeGrantType())
+        //    {
+        //        var authorization = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        //        if (!authorization.Succeeded)
+        //        {
+        //            forbidResult.Properties = new AuthenticationProperties(new Dictionary<string, string?>
+        //            {
+        //                [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
+        //                [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = authorization.Failure?.Message
+        //            });
+        //            return forbidResult;
+        //        }
 
-                claimsPrincipal = authorization.Principal;
-            }
-            else if (request.IsPasswordGrantType())
-            {
+        //        claimsPrincipal = authorization.Principal;
+        //    }
+        //    else if (request.IsPasswordGrantType())
+        //    {
                 
-                UserLoginCommand loginCommand = new()
-                {
-                    UserName = request.Username,
-                    Password = request.Password,
-                    IsRfc6749 = true,
-                    //RefreshToken = Request.Cookies["refreshToken"],
-                };
-                var identity = await _mediator.Send(loginCommand);
-                if (!identity.Succeeded)
-                {
-                    forbidResult.Properties = new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = identity.ErrorDescription
-                    });
-                    return forbidResult;
-                }
-                claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identity.User);
-                claimsPrincipal.SetScopes(request.GetScopes());
-            }
-            else
-            {
-                throw new InvalidOperationException("The specified grant type is not supported.");
-            }
+        //        UserLoginCommand loginCommand = new()
+        //        {
+        //            UserName = request.Username,
+        //            Password = request.Password,
+        //            IsRfc6749 = true,
+        //            //RefreshToken = Request.Cookies["refreshToken"],
+        //        };
+        //        var identity = await _mediator.Send(loginCommand);
+        //        if (!identity.Succeeded)
+        //        {
+        //            forbidResult.Properties = new AuthenticationProperties(new Dictionary<string, string?>
+        //            {
+        //                [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
+        //                [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = identity.ErrorDescription
+        //            });
+        //            return forbidResult;
+        //        }
+        //        claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identity.User);
+        //        claimsPrincipal.SetScopes(request.GetScopes());
+        //    }
+        //    else
+        //    {
+        //        throw new InvalidOperationException("The specified grant type is not supported.");
+        //    }
 
-            foreach (var claim in claimsPrincipal.Claims)
-            {
-                claim.SetDestinations(GetDestinations(claim, claimsPrincipal));
-            }
+        //    foreach (var claim in claimsPrincipal.Claims)
+        //    {
+        //        claim.SetDestinations(GetDestinations(claim, claimsPrincipal));
+        //    }
 
-            return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        }
+        //    return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        //}
 
-        [HttpGet("authorize")]
-        [HttpPost("authorize")]
-        [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Authorize()
-        {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
-                throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+        //[HttpGet("authorize")]
+        //[HttpPost("authorize")]
+        //[IgnoreAntiforgeryToken]
+        //public async Task<IActionResult> Authorize()
+        //{
+        //    var request = HttpContext.GetOpenIddictServerRequest() ??
+        //        throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-            var authenticate = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+        //    var authenticate = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
 
-            if (!authenticate.Succeeded)
-            {
-                return Challenge(
-                    authenticationSchemes: IdentityConstants.ApplicationScheme,
-                    properties: new AuthenticationProperties
-                    {
-                        RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                            Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                    });
-            }
+        //    if (!authenticate.Succeeded)
+        //    {
+        //        return Challenge(
+        //            authenticationSchemes: IdentityConstants.ApplicationScheme,
+        //            properties: new AuthenticationProperties
+        //            {
+        //                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
+        //                    Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
+        //            });
+        //    }
 
-            UserLoginCommand loginCommand = new()
-            {
-                UserName = authenticate.Principal.Identity?.Name,
-                //RefreshToken = Request.Cookies["refreshToken"],
-            };
+        //    UserLoginCommand loginCommand = new()
+        //    {
+        //        UserName = authenticate.Principal.Identity?.Name,
+        //        //RefreshToken = Request.Cookies["refreshToken"],
+        //    };
 
-            var identity = await _mediator.Send(loginCommand);
-            if (!identity.Succeeded)
-            {
-                ForbidResult? forbidResult = new(authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)
-                {
-                    Properties = new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = identity.ErrorDescription
-                    })
-                };
-                return forbidResult;
-            }
+        //    var identity = await _mediator.Send(loginCommand);
+        //    if (!identity.Succeeded)
+        //    {
+        //        ForbidResult? forbidResult = new(authenticationScheme: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)
+        //        {
+        //            Properties = new AuthenticationProperties(new Dictionary<string, string?>
+        //            {
+        //                [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
+        //                [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = identity.ErrorDescription
+        //            })
+        //        };
+        //        return forbidResult;
+        //    }
 
-            ClaimsPrincipal claimsPrincipal;
-            claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identity.User);
-            claimsPrincipal.SetScopes(request.GetScopes());
+        //    ClaimsPrincipal claimsPrincipal;
+        //    claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(identity.User);
+        //    claimsPrincipal.SetScopes(request.GetScopes());
 
-            return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        }
+        //    return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        //}
 
-        [HttpGet("logout")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult Logout() => View();
+        //[HttpGet("logout")]
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //public IActionResult Logout() => View();
 
-        [HttpPost("logout"), ActionName(nameof(Logout)), ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogoutPost()
-        {
-            await _signInManager.SignOutAsync();
+        //[HttpPost("logout"), ActionName(nameof(Logout)), ValidateAntiForgeryToken]
+        //public async Task<IActionResult> LogoutPost()
+        //{
+        //    await _signInManager.SignOutAsync();
 
-            return SignOut(
-                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = "/"
-                });
-        }
+        //    return SignOut(
+        //        authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+        //        properties: new AuthenticationProperties
+        //        {
+        //            RedirectUri = "/"
+        //        });
+        //}
 
         /// <summary>
         /// Solicitar JWT
@@ -399,5 +429,121 @@ namespace ApiGateway.Controllers
                     yield break;
             }
         }
+
+        ///EPs GD
+        #region EPs GD
+
+        [HttpGet("user/{paginaActual}/{numeroDeFilas}/{nombre}/{estatus}")]
+        public async Task<IActionResult> GetUsuarios(string paginaActual, string numeroDeFilas, string nombre, string estatus)
+        {
+            bool? estatusBool = null;
+            int? paginaActualInt = null;
+            int? numeroDeFilasInt = null;
+
+            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            {
+                if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
+                {
+                    throw new ValidationException($"La paginacion se encuentra en un formato incorrecto");
+                }
+                paginaActualInt = pa;
+                numeroDeFilasInt = ndf;
+            }
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO"))
+            {
+                estatusBool = true;
+            }
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO"))
+            {
+                estatusBool = false;
+            }
+
+            var usuarios = await _usuariosService.GetUsuariosAsync(paginaActualInt, numeroDeFilasInt, nombre, estatusBool);
+            RespuestaPaginacion respuesta = new()
+            {
+                PaginasTotales = paginaActualInt
+            == null ? null : (int?)Math.Ceiling(decimal.Divide(await _usuariosService.CountUsuariosAsync(nombre, estatusBool), numeroDeFilasInt ?? 1)),
+                PaginaActual = paginaActualInt,
+                Usuarios = usuarios
+            };
+            return Ok(respuesta);
+        }
+
+        [HttpGet("roles/{paginaActual}/{numeroDeFilas}/{nombreRol}/{estatus}")]
+        public async Task<IActionResult> GetRoles(string paginaActual, string numeroDeFilas, string nombreRol, string estatus)
+        {
+            bool? estatusBool = null;
+            int? paginaActualInt = null;
+            int? numeroDeFilasInt = null;
+
+            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            {
+                if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
+                {
+                    throw new ValidationException($"La paginacion se encuentra en un formato incorrecto");
+                }
+                paginaActualInt = pa;
+                numeroDeFilasInt = ndf;
+            }
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO"))
+            {
+                estatusBool = true;
+            }
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO"))
+            {
+                estatusBool = false;
+            }
+
+            var roles = await _usuariosService.GetRolesAsync(paginaActualInt, numeroDeFilasInt, nombreRol, estatusBool);
+            RespuestaPaginacion respuesta = new()
+            {
+                PaginasTotales = paginaActualInt
+            == null ? null : (int?)Math.Ceiling(decimal.Divide(await _usuariosService.CountRolesAsync(nombreRol, estatusBool), numeroDeFilasInt ?? 1)),
+                PaginaActual = paginaActualInt,
+                Roles = roles
+            };
+            return Ok(respuesta);
+        }
+
+        [HttpPut("editRole")]
+        public async Task<IActionResult> UpdateRole()
+        {
+            await _signInManager.SignOutAsync();
+
+            return SignOut(
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = "/"
+                });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> CreateUsuario()
+        {
+            await _signInManager.SignOutAsync();
+
+            return SignOut(
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = "/"
+                });
+        }
+
+        [HttpPut("editUser")]
+        public async Task<IActionResult> UpdateUsuario()
+        {
+            await _signInManager.SignOutAsync();
+
+            return SignOut(
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = "/"
+                });
+        }
+
+        #endregion
     }
 }

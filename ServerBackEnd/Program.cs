@@ -81,6 +81,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseOpenIddict();
 });
 
+builder.Services.AddDbContext<BackOfficeFerromexContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;

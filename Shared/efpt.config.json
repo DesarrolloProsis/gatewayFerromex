@@ -1,0 +1,43 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "BackOfficeFerromexContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": null,
+   "ProjectRootNamespace": "Shared",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 2,
+   "Tables": [
+      {
+         "Name": "[dbo].[AspNetRoles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AspNetUsers]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "DESKTOP-BE6Q780.BackOfficeFerromex",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}
