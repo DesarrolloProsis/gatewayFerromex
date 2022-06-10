@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Shared
 {
@@ -11,5 +12,6 @@ namespace Shared
         public string Name { get; set; }
         public string NormalizedName { get; set; }
         public string ConcurrencyStamp { get; set; }
+        public bool Active { get; set; }
     }
 }

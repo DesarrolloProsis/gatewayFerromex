@@ -9,29 +9,29 @@ namespace Shared
 {
     public class Usuario
     {
-        public string UsuarioId { get; set; }
-        public string NombreUsuario { get; set; }
-        public string Nombre { get; set; }
-        public string Apellidos { get; set; }
-        public string Rol { get; set; }
-        public string NombreCompleto { get; set; }
-        public string Estatus { get; set; }
+        public string? UsuarioId { get; set; }
+        public string? NombreUsuario { get; set; }
+        public string? Nombre { get; set; }
+        public string? Apellidos { get; set; }
+        public string? Rol { get; set; }
+        public string? NombreCompleto { get; set; }
+        public bool Estatus { get; set; }
     }
     
     public class NuevoUsuario
     {
-        public string Password { get; set; }
-        public string Nombre { get; set; }
-        public string Apellidos { get; set; }
-        public string Role { get; set; }
+        public string? Password { get; set; }
+        public string? Nombre { get; set; }
+        public string? Apellidos { get; set; }
+        public string? Role { get; set; }
     }
 
     public class Respuesta
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string NombreUsuario { get; set; }
+        public string? NombreUsuario { get; set; }
         public int Estatus { get; set; }
-        public string EstatusText { get; set; }
+        public string? EstatusText { get; set; }
     }
     public class RespuestaPaginacion
     {

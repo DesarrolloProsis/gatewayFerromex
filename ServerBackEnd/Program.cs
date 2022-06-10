@@ -76,7 +76,7 @@ builder.Services.AddHttpClient("Reportes", client => client.BaseAddress = new Ur
 builder.Services.AddCors();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
+{ 
     options.UseSqlServer(connectionString);
     options.UseOpenIddict();
 });
@@ -222,6 +222,7 @@ builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
 builder.Services.AddHostedService<Worker>();
 builder.Services.AddScoped<IReportesService, ReportesService>();
 builder.Services.AddScoped<IFerromexService, FerromexService>();
+builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

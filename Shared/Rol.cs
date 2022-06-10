@@ -10,6 +10,6 @@ namespace Shared
     {
         public string IdRol { get; set; }
         public string NombreRol { get; set; }
-        public string Estatus { get; set; }
+        public bool Estatus { get; set; }
     }
 }

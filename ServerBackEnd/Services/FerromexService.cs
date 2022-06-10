@@ -13,6 +13,16 @@ namespace ApiGateway.Services
         {
         }
 
+        public async Task<ApiResponse<TagList>> CreateTagAsync(TagList tag)
+        {
+            return await PostAsync(tag, path: "tag");
+        }
+
+        public async Task<ApiResponse<bool>> DeleteTagAsync(string? tag)
+        {
+            return await DeleteAsync<bool>(tag, path: "tag");
+        }
+
         public async Task<ApiResponse<Module>> GetModuleAsync(int id)
         {
             return await GetAsync<Module>(id, path: "module");
@@ -28,6 +38,50 @@ namespace ApiGateway.Services
             return await GetAsync<List<Module>>(path: "modules", parameters: parameters);
         }
 
+        public async Task<ApiResponse<List<TagList>>> GetTagsAsync(int? paginaActual, int? numeroDeFilas, string? tag, bool? estatus, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+            if (paginaActual != null && paginaActual != 0)
+            {
+                parameters.Add("paginaActual", paginaActual.ToString());
+            }
+            if (numeroDeFilas != null && numeroDeFilas != 0)
+            {
+                parameters.Add("numeroDeFilas", numeroDeFilas.ToString());
+            }
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (estatus != null)
+            {
+                parameters.Add("estatus", estatus.Value.ToString());
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", fecha.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+            }
+            return await GetAsync<List<TagList>>(path: "tags", parameters: parameters);
+        }
+
+        public async Task<ApiResponse<int>> GetTagsCountAsync(string? tag, bool? estatus, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (estatus != null)
+            {
+                parameters.Add("estatus", estatus.Value.ToString());
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", fecha.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+            }
+            return await GetAsync<int>(path: "tagsCount", parameters: parameters);
+        }
+
         public async Task<ApiResponse<Module>> PostModuleAsync(Module module)
         {
             return await PostAsync(module, path: "module");
@@ -36,6 +90,12 @@ namespace ApiGateway.Services
         public async Task<ApiResponse<bool>> PostRoleModulesAsync(RoleModules roleModules)
         {
             return await PostAsync<bool>(roleModules, path: "modulesrole");
+        }
+
+        public async Task<ApiResponse<bool>> UpdateTagAsync(TagList tag)
+        {
+            var res = await PutAsync<TagList>(tag.Tag, tag, path: "tag");
+            return new ApiResponse<bool>() { Succeeded = res.Succeeded};
         }
     }
 }

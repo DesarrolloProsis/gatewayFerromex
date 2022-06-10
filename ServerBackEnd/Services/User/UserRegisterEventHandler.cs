@@ -25,8 +25,10 @@ namespace ApiGateway.Services
             var entry = new ApplicationUser
             {
                 UserName = createCommand.Nombre.ToUpperInvariant()[..3] + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", ""),
-                Nombre = createCommand.Nombre,
-                Apellidos = createCommand.Apellidos,
+                Name = createCommand.Nombre,
+                LastName = createCommand.Apellidos,
+                Matricule = 1,
+                Active = true
             };
             entry.Email = entry.UserName + "@mail.com";
             var res = await _userManager.CreateAsync(entry, createCommand.Password);

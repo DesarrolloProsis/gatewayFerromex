@@ -1,5 +1,7 @@
 ﻿using ApiGateway.Data;
 using ApiGateway.Interfaces;
+using ApiGateway.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -8,23 +10,45 @@ namespace ApiGateway.Services
     public class UsuariosService : IUsuariosService
     {
         private readonly BackOfficeFerromexContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UsuariosService(BackOfficeFerromexContext dbContext)
+        public UsuariosService(BackOfficeFerromexContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
-        public Task<int> CountRolesAsync(string nombreRol, bool? estatus)
+        public async Task<int> CountRolesAsync(string nombreRol, bool? estatus)
         {
-            throw new NotImplementedException();
+            IQueryable<AspNetRole>? res = _dbContext.AspNetRoles;
+
+            if (!string.IsNullOrWhiteSpace(nombreRol))
+            {
+                res = res.Where(x => x.NormalizedName.Contains(nombreRol.Trim().ToUpper()));
+            }
+            if (estatus != null)
+            {
+                res = res.Where(x => x.Active == estatus);
+            }
+            return await res.CountAsync();
         }
 
-        public Task<int> CountUsuariosAsync(string nombre, bool? estatus)
+        public async Task<int> CountUsuariosAsync(string nombre, bool? estatus)
         {
-            throw new NotImplementedException();
+            IQueryable<AspNetUser>? res = _dbContext.AspNetUsers;
+
+            if (!string.IsNullOrWhiteSpace(nombre))
+            {
+                res = res.Where(x => x.NormalizedUserName.Contains(nombre.Trim().ToUpper()));
+            }
+            if (estatus != null)
+            {
+                res = res.Where(x => x.Active == estatus);
+            }
+            return await res.CountAsync();
         }
 
-        public Task<List<Rol>> CreateUsuarioAsync(NuevoUsuario nuevoUsuario)
+        public Task<Usuario> CreateUsuarioAsync(NuevoUsuario nuevoUsuario)
         {
             throw new NotImplementedException();
         }
@@ -39,7 +63,7 @@ namespace ApiGateway.Services
             }
             if (estatus != null)
             {
-                //res = res.Where(x => x. == estatus);
+                res = res.Where(x => x.Active == estatus);
             }
             if (paginaActual != null && numeroDeFilas != null)
             {
@@ -49,7 +73,7 @@ namespace ApiGateway.Services
             List<Rol> roles = new();
             foreach (var role in aspNetRoles)
             {
-                roles.Add(new() { IdRol = role.Id, NombreRol = role.Name, Estatus = "Activo" });
+                roles.Add(new() { IdRol = role.Id, NombreRol = role.Name, Estatus = role.Active });
             }
             return roles;
         }
@@ -60,42 +84,82 @@ namespace ApiGateway.Services
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                res = res.Where(x => x.UserName.Contains(nombre.ToUpper().Trim()));
+                res = res.Where(x => x.Name.Contains(nombre.ToUpper().Trim()));
             }
             if (estatus != null)
             {
-                //res = res.Where(x => x. == estatus);
+                res = res.Where(x => x.Active == estatus);
             }
             if (paginaActual != null && numeroDeFilas != null)
             {
                 res = res.Skip((int)((paginaActual - 1) * numeroDeFilas)).Take((int)numeroDeFilas);
             }
             var aspNetUsers = await res.ToListAsync();
+
             List<Usuario> usuarios = new();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
             foreach (var user in aspNetUsers)
             {
+                var applicationUser = await _userManager.FindByIdAsync(user.Id);
+                var roles = await _userManager.GetRolesAsync(applicationUser);
                 usuarios.Add(new()
                 {
                     UsuarioId = user.Id,
                     NombreUsuario = user.UserName,
-                    Nombre = user.UserName,
-                    Apellidos = user.UserName,
-                    NombreCompleto = user.UserName,
-                    Rol = "",
-                    Estatus = "Activo"
+                    Nombre = user.Name,
+                    Apellidos = user.LastName,
+                    NombreCompleto = user.Name + " " + user.LastName,
+                    Rol = roles.FirstOrDefault(),
+                    Estatus = user.Active
                 });
             }
             return usuarios;
         }
 
-        public Task<List<Rol>> UpdateRoleAsync(Rol rol)
+        public async Task<bool> UpdateRoleAsync(Rol rol)
         {
-            throw new NotImplementedException();
+            var entity = await _dbContext.AspNetRoles.FirstOrDefaultAsync(e => e.Id == rol.IdRol);
+            if(entity == null) return false;
+
+            entity.Name = rol.NombreRol.Trim();
+            entity.NormalizedName = rol.NombreRol.Trim().ToUpper();
+            entity.Active = rol.Estatus;
+
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+            return true;
         }
 
-        public Task<List<Rol>> UpdateUsuarioAsync(Usuario usuario)
+        public async Task<bool> UpdateUsuarioAsync(Usuario usuario)
         {
-            throw new NotImplementedException();
+            var entity = await _dbContext.AspNetUsers.FirstOrDefaultAsync(e => e.Id == usuario.UsuarioId);
+            if (entity == null) return false;
+
+            entity.UserName = usuario.NombreUsuario.Trim();
+            entity.NormalizedUserName = usuario.NombreUsuario.Trim().ToUpper();
+            entity.Name = usuario.Nombre;
+            entity.LastName = usuario.Apellidos;
+            entity.Active = usuario.Estatus;
+
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+            return true;
         }
+
     }
 }

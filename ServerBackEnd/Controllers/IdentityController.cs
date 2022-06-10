@@ -55,9 +55,15 @@ namespace ApiGateway.Controllers
                 {
                     return BadRequest(result.Errors);
                 }
-                var res = await _mediator.Send(new UserFindCommand { Username = createCommand.Nombre.ToUpperInvariant()[..3]
-                    + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", "") });
-                return CreatedAtAction("Find", new { res.Id }, res);
+                var userName = createCommand.Nombre.ToUpperInvariant()[..3]
+                    + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", "");
+                User? res = await _mediator.Send(new UserFindCommand
+                {
+                    Username = userName
+                });
+                //return CreatedAtAction("Find", new { res.Id }, res);
+                Respuesta respuesta = new() { Estatus = 200, EstatusText = "OK", NombreUsuario = userName };
+                return Ok(respuesta);
             }
             return BadRequest();
         }
@@ -389,6 +395,7 @@ namespace ApiGateway.Controllers
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
+
         private IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
         {
             // Note: by default, claims are NOT automatically included in the access and identity tokens.
@@ -434,7 +441,7 @@ namespace ApiGateway.Controllers
         #region EPs GD
 
         [HttpGet("user/{paginaActual}/{numeroDeFilas}/{nombre}/{estatus}")]
-        public async Task<IActionResult> GetUsuarios(string paginaActual, string numeroDeFilas, string nombre, string estatus)
+        public async Task<IActionResult> GetUsuarios(string? paginaActual, string? numeroDeFilas, string? nombre, string? estatus)
         {
             bool? estatusBool = null;
             int? paginaActualInt = null;
@@ -449,11 +456,13 @@ namespace ApiGateway.Controllers
                 paginaActualInt = pa;
                 numeroDeFilasInt = ndf;
             }
-            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO"))
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO") 
+                || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("TRUE"))
             {
                 estatusBool = true;
             }
-            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO"))
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO") 
+                || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("FALSE"))
             {
                 estatusBool = false;
             }
@@ -470,7 +479,7 @@ namespace ApiGateway.Controllers
         }
 
         [HttpGet("roles/{paginaActual}/{numeroDeFilas}/{nombreRol}/{estatus}")]
-        public async Task<IActionResult> GetRoles(string paginaActual, string numeroDeFilas, string nombreRol, string estatus)
+        public async Task<IActionResult> GetRoles(string? paginaActual, string? numeroDeFilas, string? nombreRol, string? estatus)
         {
             bool? estatusBool = null;
             int? paginaActualInt = null;
@@ -485,11 +494,13 @@ namespace ApiGateway.Controllers
                 paginaActualInt = pa;
                 numeroDeFilasInt = ndf;
             }
-            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO"))
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO")
+                || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("TRUE"))
             {
                 estatusBool = true;
             }
-            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO"))
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO")
+                || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("FALSE"))
             {
                 estatusBool = false;
             }
@@ -506,42 +517,41 @@ namespace ApiGateway.Controllers
         }
 
         [HttpPut("editRole")]
-        public async Task<IActionResult> UpdateRole()
+        public async Task<IActionResult> UpdateRole(Rol rol)
         {
-            await _signInManager.SignOutAsync();
-
-            return SignOut(
-                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = "/"
-                });
+            try
+            {
+                var res = await _usuariosService.UpdateRoleAsync(rol);
+                if (res)
+                    return Ok(new Respuesta() { Estatus = 200, EstatusText = "OK" });
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = "Rol invalido" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = e.Message });
+            }
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> CreateUsuario()
-        {
-            await _signInManager.SignOutAsync();
-
-            return SignOut(
-                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = "/"
-                });
-        }
+        //[HttpPost("register")]
+        //public async Task<IActionResult> CreateUsuario(NuevoUsuario nuevoUsuario)
+        //{
+        //    return BadRequest();
+        //}
 
         [HttpPut("editUser")]
-        public async Task<IActionResult> UpdateUsuario()
+        public async Task<IActionResult> UpdateUsuario(Usuario usuario)
         {
-            await _signInManager.SignOutAsync();
-
-            return SignOut(
-                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = "/"
-                });
+            try
+            {
+                var res = await _usuariosService.UpdateUsuarioAsync(usuario);
+                if (res)
+                    return Ok(new Respuesta() { Estatus = 200, EstatusText = "OK" });
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = "Usuario invalido" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = e.Message });
+            }
         }
 
         #endregion
