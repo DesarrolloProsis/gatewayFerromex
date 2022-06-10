@@ -24,7 +24,7 @@ namespace ApiGateway.Services
                 return IdentityResult.Failed(_userManager.ErrorDescriber.InvalidRoleName(createCommand.RoleName));
             var entry = new ApplicationUser
             {
-                UserName = createCommand.Nombre.ToUpperInvariant()[..3] + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", ""),
+                UserName = createCommand.Nombre[..3] + Regex.Replace(createCommand.Apellidos, @"\s+", ""),
                 Name = createCommand.Nombre,
                 LastName = createCommand.Apellidos,
                 Matricule = 1,

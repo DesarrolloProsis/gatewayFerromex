@@ -14,6 +14,9 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<bool>> UpdateTagAsync(TagList tag);
         Task<ApiResponse<TagList>> CreateTagAsync(TagList tag);
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
+        Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
+        Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha);
+        Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha);
 
         ///EPs GD
 

@@ -39,12 +39,13 @@ namespace ApiGateway.Services
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                res = res.Where(x => x.NormalizedUserName.Contains(nombre.Trim().ToUpper()));
+                res = res.Where(x => x.Name.Contains(nombre.ToUpper().Trim()));
             }
             if (estatus != null)
             {
                 res = res.Where(x => x.Active == estatus);
             }
+            Console.WriteLine(res.ToQueryString());
             return await res.CountAsync();
         }
 

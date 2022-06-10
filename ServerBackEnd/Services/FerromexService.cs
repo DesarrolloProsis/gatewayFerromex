@@ -97,5 +97,62 @@ namespace ApiGateway.Services
             var res = await PutAsync<TagList>(tag.Tag, tag, path: "tag");
             return new ApiResponse<bool>() { Succeeded = res.Succeeded};
         }
+
+        public async Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync()
+        {
+            return await GetAsync<List<LaneCatalog>>(path: "lanes");
+        }
+
+        public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+            if (paginaActual != null && paginaActual != 0)
+            {
+                parameters.Add("paginaActual", paginaActual.ToString());
+            }
+            if (numeroDeFilas != null && numeroDeFilas != 0)
+            {
+                parameters.Add("numeroDeFilas", numeroDeFilas.ToString());
+            }
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (!string.IsNullOrEmpty(carril))
+            {
+                parameters.Add("carril", carril);
+            }
+            if (!string.IsNullOrEmpty(cuerpo))
+            {
+                parameters.Add("cuerpo", cuerpo);
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", fecha.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+            }
+            return await GetAsync<List<Cruce>>(path: "cruces", parameters: parameters);
+        }
+        public async Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (!string.IsNullOrEmpty(carril))
+            {
+                parameters.Add("carril", carril);
+            }
+            if (!string.IsNullOrEmpty(cuerpo))
+            {
+                parameters.Add("cuerpo", cuerpo);
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", fecha.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
+            }
+            return await GetAsync<int>(path: "transactionsCount", parameters: parameters);
+        }
+
     }
 }

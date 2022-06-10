@@ -55,8 +55,8 @@ namespace ApiGateway.Controllers
                 {
                     return BadRequest(result.Errors);
                 }
-                var userName = createCommand.Nombre.ToUpperInvariant()[..3]
-                    + Regex.Replace(createCommand.Apellidos.ToUpperInvariant(), @"\s+", "");
+                var userName = createCommand.Nombre[..3]
+                    + Regex.Replace(createCommand.Apellidos, @"\s+", "");
                 User? res = await _mediator.Send(new UserFindCommand
                 {
                     Username = userName
@@ -468,10 +468,11 @@ namespace ApiGateway.Controllers
             }
 
             var usuarios = await _usuariosService.GetUsuariosAsync(paginaActualInt, numeroDeFilasInt, nombre, estatusBool);
+            var count = await _usuariosService.CountUsuariosAsync(nombre, estatusBool);
             RespuestaPaginacion respuesta = new()
             {
                 PaginasTotales = paginaActualInt
-            == null ? null : (int?)Math.Ceiling(decimal.Divide(await _usuariosService.CountUsuariosAsync(nombre, estatusBool), numeroDeFilasInt ?? 1)),
+            == null ? null : (int?)Math.Ceiling(decimal.Divide(count, numeroDeFilasInt ?? 1)),
                 PaginaActual = paginaActualInt,
                 Usuarios = usuarios
             };

@@ -207,7 +207,77 @@ namespace ApiGateway.Controllers
             return BadRequest();
         }
         #endregion
+        #region Telepeaje
 
+        [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}")]
+        public async Task<IActionResult> GetTransactions(string? paginaActual, string? numeroDeFilas, string? tag, string? carril, string? cuerpo, string? fecha)
+        {
+            paginaActual = GetNullableString(paginaActual);
+            numeroDeFilas = GetNullableString(numeroDeFilas);
+            tag = GetNullableString(tag);
+            carril = GetNullableString(carril);
+            cuerpo = GetNullableString(cuerpo);
+            fecha = GetNullableString(fecha);
+
+            DateTime? fechaDt = null;
+            int? paginaActualInt = null;
+            int? numeroDeFilasInt = null;
+
+            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            {
+                if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
+                {
+                    return BadRequest($"La paginacion se encuentra en un formato incorrecto");
+                }
+                paginaActualInt = pa;
+                numeroDeFilasInt = ndf;
+            }
+            if (!string.IsNullOrWhiteSpace(cuerpo) && cuerpo.Trim().ToUpper().Equals("A")
+                || !string.IsNullOrWhiteSpace(cuerpo) && cuerpo.Trim().ToUpper().Equals("B"))
+            {
+                cuerpo = $"Cuerpo {cuerpo.Trim().ToUpper()}";
+            }
+            if (!string.IsNullOrWhiteSpace(fecha))
+            {
+                if (!DateTime.TryParse(fecha, out DateTime dt))
+                    return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
+                fechaDt = dt;
+            }
+            var tags = await _ferromexService.GetTransactionsAsync(paginaActualInt, numeroDeFilasInt, tag, carril, cuerpo, fechaDt);
+            var tagsCountResponse = await _ferromexService.GetTransactionsCountAsync(tag, carril, cuerpo, fechaDt);
+
+            if (!tagsCountResponse.Succeeded)
+            {
+                return BadRequest(tagsCountResponse.ErrorMessage);
+            }
+
+            CrucesPaginacion res = new()
+            {
+                PaginasTotales = paginaActualInt
+                == null ? null : (int?)Math.Ceiling(decimal.Divide(tagsCountResponse.Content, numeroDeFilasInt ?? 1)),
+                PaginaActual = paginaActualInt,
+                Cruces = tags.Content
+            };
+            return Ok(res);
+        }
+
+        [HttpGet("carriles")]
+        public async Task<IActionResult> GetLanes()
+        {
+            var res = await _ferromexService.GetLanesAsync();
+            if (res != null)
+            {
+                List<Carril> carriles = new();
+                foreach (var carril in res.Content)
+                {
+                    carriles.Add(new() { Id = carril.IdLane, Nombre = carril.Name });
+                }
+                return Ok(carriles);
+            }
+            return BadRequest();
+        }
+
+        #endregion
         static string? GetNullableString(string value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
     }
 }
