@@ -97,5 +97,91 @@ namespace ApiGateway.Services
             var res = await PutAsync<TagList>(tag.Tag, tag, path: "tag");
             return new ApiResponse<bool>() { Succeeded = res.Succeeded};
         }
+
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(int? dia, string? mes, int? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (dia != null)
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (semana != null)
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(int? dia, string? mes, int? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (dia != null)
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (semana != null)
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(int? dia, string? mes, int? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (dia != null)
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (semana != null)
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, string? estatus, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (!string.IsNullOrEmpty(estatus))
+            {
+                parameters.Add("estatus", estatus);
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(ReporteOperativo reporteOperativo)
+        {
+            return await PostAsync<byte[]>(reporteOperativo, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(ReporteOperativo reporteOperativo)
+        {
+            return await PostAsync<byte[]>(reporteOperativo, path: "");
+        }
     }
 }
+
