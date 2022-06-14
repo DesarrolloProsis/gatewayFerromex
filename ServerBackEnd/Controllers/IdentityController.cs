@@ -447,7 +447,7 @@ namespace ApiGateway.Controllers
             int? paginaActualInt = null;
             int? numeroDeFilasInt = null;
 
-            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            if (!string.IsNullOrWhiteSpace(paginaActual) && !string.IsNullOrWhiteSpace(numeroDeFilas))
             {
                 if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
                 {
@@ -486,7 +486,7 @@ namespace ApiGateway.Controllers
             int? paginaActualInt = null;
             int? numeroDeFilasInt = null;
 
-            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            if (!string.IsNullOrWhiteSpace(paginaActual) && !string.IsNullOrWhiteSpace(numeroDeFilas))
             {
                 if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
                 {
@@ -545,6 +545,22 @@ namespace ApiGateway.Controllers
             try
             {
                 var res = await _usuariosService.UpdateUsuarioAsync(usuario);
+                if (res)
+                    return Ok(new Respuesta() { Estatus = 200, EstatusText = "OK" });
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = "Usuario invalido" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new Respuesta() { Estatus = 400, EstatusText = e.Message });
+            }
+        }
+
+        [HttpPut("changePassword")]
+        public async Task<IActionResult> UpdatePassword(UsuarioUpdatePassword usuarioUpdatePassword)
+        {
+            try
+            {
+                var res = await _usuariosService.UpdateUsuarioPasswordAsync(usuarioUpdatePassword);
                 if (res)
                     return Ok(new Respuesta() { Estatus = 200, EstatusText = "OK" });
                 return BadRequest(new Respuesta() { Estatus = 400, EstatusText = "Usuario invalido" });

@@ -9,6 +9,7 @@ namespace ApiGateway.Interfaces
         Task<bool> UpdateRoleAsync(Rol rol);
         Task<Usuario> CreateUsuarioAsync(NuevoUsuario nuevoUsuario);
         Task<bool> UpdateUsuarioAsync(Usuario usuario);
+        Task<bool> UpdateUsuarioPasswordAsync(UsuarioUpdatePassword usuario);
         Task<int> CountUsuariosAsync(string nombre, bool? estatus);
         Task<int> CountRolesAsync(string nombreRol, bool? estatus);
     }

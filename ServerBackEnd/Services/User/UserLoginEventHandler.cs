@@ -85,10 +85,13 @@ namespace ApiGateway.Services
         {
             var secretKey = _configuration.GetValue<string>("SecretKey");
             var key = Encoding.ASCII.GetBytes(secretKey);
-
+            IDictionary<string, object> claims = new Dictionary<string, object>();
+            claims.Add("nombreCompleto", $"{user.Name} {user.LastName}");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                
                 Subject = new ClaimsIdentity(identity.ClaimsPrincipal?.Claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme),
+                Claims = claims,
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),

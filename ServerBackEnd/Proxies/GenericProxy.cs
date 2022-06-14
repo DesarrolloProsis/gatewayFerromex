@@ -114,10 +114,10 @@ namespace ApiGateway.Proxies
         /// <param name="parameters">Diccionario de parametros a embebir en la URI en formato "llave","valor"</param>
         /// <param name="path">Ruta del servicio, si no se especifica se asumira el nombre del objeto como ruta</param>
         /// <returns>Respuesta de tipo bool si la operacion se completo de manera satisfactoria en el endpoint del servicio consultado</returns>
-        public async Task<ApiResponse<T>> PutAsync<T>(object? id, T? value, Dictionary<string, string>? parameters = null, string? path = null)
+        public async Task<ApiResponse> PutAsync<T>(object? id, T? value, Dictionary<string, string>? parameters = null, string? path = null)
         {
             using HttpResponseMessage httpResponse = await _httpClient.PutAsJsonAsync(GetUri<T>(id, parameters, path), value);
-            return await ParseHttpResponseAsync<T>(httpResponse);
+            return await ParseHttpResponseAsync(httpResponse);
         }
         public async Task<ApiResponse> PutAsync(object? id, object? value, Dictionary<string, string>? parameters = null, string? path = null)
         {
@@ -133,10 +133,10 @@ namespace ApiGateway.Proxies
         /// <param name="parameters">Diccionario de parametros a embebir en la URI en formato "llave","valor"</param>
         /// <param name="path">Ruta del servicio, si no se especifica se asumira el nombre del objeto como ruta</param>
         /// <returns>Respuesta de tipo bool si la operacion se completo de manera satisfactoria en el endpoint del servicio consultado</returns>
-        public async Task<ApiResponse<T>> PutAsync<T>(object? id, HttpContent? content, Dictionary<string, string>? parameters = null, string? path = null)
+        public async Task<ApiResponse> PutAsync<T>(object? id, HttpContent? content, Dictionary<string, string>? parameters = null, string? path = null)
         {
             using HttpResponseMessage httpResponse = await _httpClient.PutAsync(GetUri<T>(id, parameters, path), content);
-            return await ParseHttpResponseAsync<T>(httpResponse);
+            return await ParseHttpResponseAsync(httpResponse);
         }
         public async Task<ApiResponse> PutAsync(object? id, HttpContent? content, Dictionary<string, string>? parameters = null, string? path = null)
         {

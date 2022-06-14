@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReportesData.Models;
 using Shared;
+using System.Globalization;
 using System.Net.Mime;
 
 namespace ApiGateway.Controllers
@@ -22,19 +23,7 @@ namespace ApiGateway.Controllers
         #region Modulos
 
         // GET: api/<Controller>/module/1
-        /// <summary>
-        /// Obtener la informacion del usuario logueado en la plaza.
-        /// </summary>
-        /// <returns>Regresa un modelo con los detalles de registro del usuario autentificado.</returns>
-        /// <response code="200">Regresa el objeto solicitado</response>
-        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpGet("module/{id}")]
-        [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponse<Module>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<Module>>> GetModule(int id)
         {
             //int idInt = 0;
@@ -51,56 +40,20 @@ namespace ApiGateway.Controllers
         }
 
         // GET: api/<Controller>/modules
-        /// <summary>
-        /// Obtener la informacion del usuario logueado en la plaza.
-        /// </summary>
-        /// <returns>Regresa un modelo con los detalles de registro del usuario autentificado.</returns>
-        /// <response code="200">Regresa el objeto solicitado</response>
-        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpGet("modules")]
-        [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(typeof(ApiResponse<List<Module>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<List<Module>>>> GetModules(string? role)
         {
             return Ok(await _ferromexService.GetModulesAsync(role));
         }
 
-        // GET: api/<Controller>/module/1
-        /// <summary>
-        /// Obtener la informacion del usuario logueado en la plaza.
-        /// </summary>
-        /// <returns>Regresa un modelo con los detalles de registro del usuario autentificado.</returns>
-        /// <response code="200">Regresa el objeto solicitado</response>
-        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
+        // POST: api/<Controller>/module
         [HttpPost("module")]
-        [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(typeof(ApiResponse<Module>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<Module>>> PostModule(Module module)
         {
             return Ok(await _ferromexService.PostModuleAsync(module));
         }
 
-        /// <summary>
-        /// Registrar roles de usuario 
-        /// </summary>
-        /// <param name="addRolesCommand">Parametros de registro</param>
-        /// <returns>Regresa el codigo de estado.</returns>
-        /// <response code="204">Se agregaron correctamento los roles al usuario</response>
-        /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPost("addRoleModules")]
-        [Consumes(MediaTypeNames.Application.Json)]
-        [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddRoleModules(RoleModules roleModules)
         {
             if (ModelState.IsValid)
@@ -132,7 +85,7 @@ namespace ApiGateway.Controllers
             int? paginaActualInt = null;
             int? numeroDeFilasInt = null;
 
-            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            if (!string.IsNullOrWhiteSpace(paginaActual) && !string.IsNullOrWhiteSpace(numeroDeFilas))
             {
                 if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
                 {
@@ -153,7 +106,7 @@ namespace ApiGateway.Controllers
             }
             if (!string.IsNullOrWhiteSpace(fecha))
             {
-                if (!DateTime.TryParse(fecha, out DateTime dt))
+                if (!DateTime.TryParse(fecha, null, DateTimeStyles.RoundtripKind, out DateTime dt))
                     return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
                 fechaDt = dt;
             }
@@ -179,8 +132,8 @@ namespace ApiGateway.Controllers
         {
             if (ModelState.IsValid)
             {
-                _ferromexService.CreateTagAsync(tag);
-                return NoContent();
+                var res = await _ferromexService.CreateTagAsync(tag);
+                if (res.Succeeded) return NoContent();
             }
             return BadRequest();
         }
@@ -190,8 +143,8 @@ namespace ApiGateway.Controllers
         {
             if (ModelState.IsValid)
             {
-                _ferromexService.UpdateTagAsync(tag);
-                return NoContent();
+                var res = await _ferromexService.UpdateTagAsync(tag);
+                if (res.Succeeded) return NoContent();
             }
             return BadRequest();
         }
@@ -201,8 +154,8 @@ namespace ApiGateway.Controllers
         {
             if (!string.IsNullOrWhiteSpace(tag))
             {
-                _ferromexService.DeleteTagAsync(tag);
-                return NoContent();
+                var res = await _ferromexService.DeleteTagAsync(tag);
+                if(res.Succeeded) return NoContent();
             }
             return BadRequest();
         }
@@ -223,7 +176,7 @@ namespace ApiGateway.Controllers
             int? paginaActualInt = null;
             int? numeroDeFilasInt = null;
 
-            if (!string.IsNullOrWhiteSpace(paginaActual) || !string.IsNullOrWhiteSpace(numeroDeFilas))
+            if (!string.IsNullOrWhiteSpace(paginaActual) && !string.IsNullOrWhiteSpace(numeroDeFilas))
             {
                 if (!int.TryParse(paginaActual.Trim(), out int pa) || !int.TryParse(numeroDeFilas.Trim(), out int ndf))
                 {
@@ -239,7 +192,7 @@ namespace ApiGateway.Controllers
             }
             if (!string.IsNullOrWhiteSpace(fecha))
             {
-                if (!DateTime.TryParse(fecha, out DateTime dt))
+                if (!DateTime.TryParse(fecha, null, DateTimeStyles.RoundtripKind, out DateTime dt))
                     return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
                 fechaDt = dt;
             }
@@ -278,6 +231,6 @@ namespace ApiGateway.Controllers
         }
 
         #endregion
-        static string? GetNullableString(string value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
+        static string? GetNullableString(string? value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
     }
 }

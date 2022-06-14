@@ -8,10 +8,10 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<Module>> GetModuleAsync(int id);
         Task<ApiResponse<List<Module>>> GetModulesAsync(string? role = null);
         Task<ApiResponse<Module>> PostModuleAsync(Module module);
-        Task<ApiResponse<bool>> PostRoleModulesAsync(RoleModules roleModules);
+        Task<ApiResponse<RoleModules>> PostRoleModulesAsync(RoleModules roleModules);
         Task<ApiResponse<List<TagList>>> GetTagsAsync(int? paginaActual, int? numeroDeFilas, string? tag, bool? estatus, DateTime? fecha);
         Task<ApiResponse<int>> GetTagsCountAsync(string? tag, bool? estatus, DateTime? fecha);
-        Task<ApiResponse<bool>> UpdateTagAsync(TagList tag);
+        Task<ApiResponse> UpdateTagAsync(TagList tag);
         Task<ApiResponse<TagList>> CreateTagAsync(TagList tag);
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();

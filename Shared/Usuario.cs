@@ -25,6 +25,11 @@ namespace Shared
         public string? Apellidos { get; set; }
         public string? Role { get; set; }
     }
+    public class UsuarioUpdatePassword
+    {
+        public string? Password { get; set; }
+        public string? UsuarioId { get; set; }
+    }
 
     public class Respuesta
     {

@@ -87,15 +87,14 @@ namespace ApiGateway.Services
             return await PostAsync(module, path: "module");
         }
 
-        public async Task<ApiResponse<bool>> PostRoleModulesAsync(RoleModules roleModules)
+        public async Task<ApiResponse<RoleModules>> PostRoleModulesAsync(RoleModules roleModules)
         {
-            return await PostAsync<bool>(roleModules, path: "modulesrole");
+            return await PostAsync(roleModules, path: "modulesrole");
         }
 
-        public async Task<ApiResponse<bool>> UpdateTagAsync(TagList tag)
+        public async Task<ApiResponse> UpdateTagAsync(TagList tag)
         {
-            var res = await PutAsync<TagList>(tag.Tag, tag, path: "tag");
-            return new ApiResponse<bool>() { Succeeded = res.Succeeded};
+            return await PutAsync(tag.Tag, tag, path: "tag");
         }
 
         public async Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync()

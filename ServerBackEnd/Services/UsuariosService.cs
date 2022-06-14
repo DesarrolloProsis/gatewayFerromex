@@ -11,11 +11,13 @@ namespace ApiGateway.Services
     {
         private readonly BackOfficeFerromexContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsuariosService(BackOfficeFerromexContext dbContext, UserManager<ApplicationUser> userManager)
+        public UsuariosService(BackOfficeFerromexContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<int> CountRolesAsync(string nombreRol, bool? estatus)
@@ -149,6 +151,14 @@ namespace ApiGateway.Services
             entity.LastName = usuario.Apellidos;
             entity.Active = usuario.Estatus;
 
+            if (!string.IsNullOrWhiteSpace(usuario.Rol) && await _roleManager.RoleExistsAsync(usuario.Rol))
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(entity.Id);
+                var roles = await _userManager.GetRolesAsync(user);
+                await _userManager.RemoveFromRolesAsync(user, roles);
+                await _userManager.AddToRoleAsync(user, usuario.Rol);
+            }
+
             _dbContext.Entry(entity).State = EntityState.Modified;
 
             try
@@ -162,5 +172,13 @@ namespace ApiGateway.Services
             return true;
         }
 
+        public async Task<bool> UpdateUsuarioPasswordAsync(UsuarioUpdatePassword usuario)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(usuario.UsuarioId);
+            if (user == null) return false;
+            await _userManager.RemovePasswordAsync(user);
+            await _userManager.AddPasswordAsync(user, usuario.Password);
+            return true;
+        }
     }
 }
