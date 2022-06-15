@@ -15,12 +15,13 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<bool>> UpdateTagAsync(TagList tag);
         Task<ApiResponse<TagList>> CreateTagAsync(TagList tag);
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
-        Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(int? dia, string? mes, int? semana);
-        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(int? dia, string? mes, int? semana);
-        Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(int? dia, string? mes, int? semana);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, string? estatus, DateTime? fecha);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(ReporteOperativo reporteOperativo);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(ReporteOperativo reporteOperativo);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha);
+        Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
         ///EPs GD
 
         //Task<ApiResponse<bool>> GetMantenimientoTags(string paginaActual, string numeroDeFilas, string tag, string estatus, string fecha);
