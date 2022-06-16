@@ -161,16 +161,21 @@ namespace ApiGateway.Controllers
                     return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
                 fechaDt = dt;
             }
-            var tags = await _ferromexService.GetTagsAsync(paginaActualInt, numeroDeFilasInt, tag, estatusBool, fechaDt);
+
             var tagsCountResponse = await _ferromexService.GetTagsCountAsync(tag, estatusBool, fechaDt);
+            var tags = tagsCountResponse.Content < numeroDeFilasInt 
+                ? await _ferromexService.GetTagsAsync(paginaActualInt, tagsCountResponse.Content, tag, estatusBool, fechaDt) 
+                : await _ferromexService.GetTagsAsync(paginaActualInt, numeroDeFilasInt, tag, estatusBool, fechaDt);    
+
             if (!tagsCountResponse.Succeeded)
             {
                 return BadRequest(tagsCountResponse.ErrorMessage);
             }
             MantenimientoTags res = new()
             {
-                PaginasTotales = paginaActualInt
-                == null ? null : (int?)Math.Ceiling(decimal.Divide(tagsCountResponse.Content, numeroDeFilasInt ?? 1)),
+                PaginasTotales = paginaActualInt == null 
+                    ? null 
+                    : (int?)Math.Ceiling(decimal.Divide(tagsCountResponse.Content, numeroDeFilasInt ?? 1)),
                 PaginaActual = paginaActualInt,
                 Tags = tags.Content
             };
@@ -247,7 +252,24 @@ namespace ApiGateway.Controllers
 
         #region Telepeaje
 
+        /// <summary>
+        /// Obtine una pagiancion de tag aplicando filtros
+        /// </summary>        
+        /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
+        /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
+        /// <param name="tag">Numero de tag</param>   
+        /// <param name="carril">Numero de carril</param>   
+        /// <param name="cuerpo">Cuerpo del carril</param>   
+        /// <param name="fecha">Filtro fecha para los tags</param>  
+        /// <response code="200">Se obtiene el objeto para la paginacion de Tags.</response>        
+        /// <response code="400">Alguno de los parametros no es valido.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
+        /// <returns>Regresa pagiancion de tags</returns>
         [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CrucesPaginacion))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> GetTransactions(string? paginaActual, string? numeroDeFilas, string? tag, string? carril, string? cuerpo, string? fecha)
         {
             paginaActual = GetNullableString(paginaActual);
@@ -281,8 +303,11 @@ namespace ApiGateway.Controllers
                     return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
                 fechaDt = dt;
             }
-            var tags = await _ferromexService.GetTransactionsAsync(paginaActualInt, numeroDeFilasInt, tag, carril, cuerpo, fechaDt);
-            var tagsCountResponse = await _ferromexService.GetTransactionsCountAsync(tag, carril, cuerpo, fechaDt);
+            
+            var tagsCountResponse = await _ferromexService.GetTransactionsCountAsync(tag, carril, cuerpo, fechaDt);            
+            var tags = tagsCountResponse.Content < numeroDeFilasInt
+                ? await _ferromexService.GetTransactionsAsync(paginaActualInt, tagsCountResponse.Content, tag, carril, cuerpo, fechaDt)
+                : await _ferromexService.GetTransactionsAsync(paginaActualInt, numeroDeFilasInt, tag, carril, cuerpo, fechaDt);
 
             if (!tagsCountResponse.Succeeded)
             {
@@ -291,8 +316,9 @@ namespace ApiGateway.Controllers
 
             CrucesPaginacion res = new()
             {
-                PaginasTotales = paginaActualInt
-                == null ? null : (int?)Math.Ceiling(decimal.Divide(tagsCountResponse.Content, numeroDeFilasInt ?? 1)),
+                PaginasTotales = paginaActualInt == null 
+                    ? null 
+                    : (int?)Math.Ceiling(decimal.Divide(tagsCountResponse.Content, numeroDeFilasInt ?? 1)),
                 PaginaActual = paginaActualInt,
                 Cruces = tags.Content
             };
