@@ -107,19 +107,21 @@ namespace ApiGateway.Controllers
         #region Mantenimiento Tags
 
         /// <summary>
-        /// Relaciona un modulo a un role
+        /// Obtine una pagiancion de tag aplicando filtros
         /// </summary>        
-        /// <param name="roleModules">Objeto necesario para relacionar un modula a un role</param>                   
-        /// <response code="200">Se relaciono el moudulo a un rol.</response>        
-        /// <response code="400">No se relaciono el moudulo a un rol.</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
-        [HttpPost("addRoleModules")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-
+        /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
+        /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
+        /// <param name="tag">Numero de tag</param>   
+        /// <param name="estatus">Estatus de los tags</param>   
+        /// <param name="fecha">Filtro fecha para los tags</param>   
+        /// <response code="200">Se obtiene el objeto para la paginacion de Tags.</response>        
+        /// <response code="400">Alguno de los parametros no es valido.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>      
         [HttpGet("mantenimientotags/{paginaActual}/{numeroDeFilas}/{tag}/{estatus}/{fecha}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MantenimientoTags))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(MantenimientoTags))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]             
         public async Task<IActionResult> GetTags(string? paginaActual, string? numeroDeFilas, string? tag, string? estatus, string? fecha)
         {
             paginaActual = GetNullableString(paginaActual);
@@ -174,14 +176,25 @@ namespace ApiGateway.Controllers
             return Ok(res);
         }
 
-
+        /// <summary>
+        /// Inserta un nuevo tag
+        /// </summary>        
+        /// <param name="TagList">Objeto necesario para insertar un nuevo tag</param>               
+        /// <response code="200">Se inserto un nuevo tag.</response>        
+        /// <response code="400">Alguno de los parametros no es valido.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
+        /// <returns>Regresa el moudlo creado</returns>
         [HttpPost("agregartag")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<TagList>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<TagList>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> CreateTag(TagList tag)
         {
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.CreateTagAsync(tag);
-                if (res.Succeeded) return NoContent();
+                if (res.Succeeded) return Ok(res);                
             }
             return BadRequest();
         }
@@ -192,7 +205,10 @@ namespace ApiGateway.Controllers
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.UpdateTagAsync(tag);
-                if (res.Succeeded) return NoContent();
+                if (res.Succeeded) return Ok(res);
+
+                return StatusCode(res.Status);
+
             }
             return BadRequest();
         }
@@ -203,7 +219,9 @@ namespace ApiGateway.Controllers
             if (!string.IsNullOrWhiteSpace(tag))
             {
                 var res = await _ferromexService.DeleteTagAsync(tag);
-                if(res.Succeeded) return NoContent();
+                if (res.Succeeded) return Ok(res);
+
+                return StatusCode(res.Status);
             }
             return BadRequest();
         }
