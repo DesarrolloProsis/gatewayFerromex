@@ -116,11 +116,12 @@ namespace ApiGateway.Controllers
         /// <param name="fecha">Filtro fecha para los tags</param>   
         /// <response code="200">Se obtiene el objeto para la paginacion de Tags.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>      
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
+        /// <returns>Regresa pagiancion de tags</returns>
         [HttpGet("mantenimientotags/{paginaActual}/{numeroDeFilas}/{tag}/{estatus}/{fecha}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MantenimientoTags))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(MantenimientoTags))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]             
         public async Task<IActionResult> GetTags(string? paginaActual, string? numeroDeFilas, string? tag, string? estatus, string? fecha)
         {
@@ -179,49 +180,65 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Inserta un nuevo tag
         /// </summary>        
-        /// <param name="TagList">Objeto necesario para insertar un nuevo tag</param>               
-        /// <response code="200">Se inserto un nuevo tag.</response>        
+        /// <param name="tag">Objeto necesario para insertar un nuevo tag</param>               
+        /// <response code="204">Se inserto un nuevo tag.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
-        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
-        /// <returns>Regresa el moudlo creado</returns>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpPost("agregartag")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<TagList>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<TagList>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> CreateTag(TagList tag)
         {
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.CreateTagAsync(tag);
-                if (res.Succeeded) return Ok(res);                
+                if (res.Succeeded) return NoContent();
             }
             return BadRequest();
         }
 
+        /// <summary>
+        /// Edita un tag en especifico
+        /// </summary>        
+        /// <param name="tag">Objeto necesario para editar el tag</param>               
+        /// <response code="204">Se inserto un nuevo tag.</response>        
+        /// <response code="400">Alguno de los parametros no es valido.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpPut("editartag")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateTag(TagList tag)
         {
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.UpdateTagAsync(tag);
-                if (res.Succeeded) return Ok(res);
-
-                return StatusCode(res.Status);
-
+                if (res.Succeeded) return NoContent();               
             }
             return BadRequest();
         }
 
+        /// <summary>
+        /// Elimina un tag en especifico
+        /// </summary>        
+        /// <param name="tag">Objeto necesario para eliminar el tag</param>               
+        /// <response code="204">Se inserto un nuevo tag.</response>        
+        /// <response code="400">Alguno de los parametros no es valido.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpDelete("eliminartag/{tag}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> DeleteTag(string tag)
         {
             if (!string.IsNullOrWhiteSpace(tag))
             {
                 var res = await _ferromexService.DeleteTagAsync(tag);
-                if (res.Succeeded) return Ok(res);
-
-                return StatusCode(res.Status);
+                if (res.Succeeded) return NoContent();
             }
             return BadRequest();
         }
