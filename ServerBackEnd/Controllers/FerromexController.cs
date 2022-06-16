@@ -92,17 +92,7 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> AddRoleModules(RoleModules roleModules)
-        {
-            //if (ModelState.IsValid)
-            //{
-            //    var result = await _ferromexService.PostRoleModulesAsync(roleModules);
-            //    if (!result.Succeeded)
-            //    {
-            //        return Ok(result);
-            //    }
-            //    return BadRequest();
-            //}
-            //return BadRequest();
+        {    
             if (ModelState.IsValid)
             {
                 var result = await _ferromexService.PostRoleModulesAsync(roleModules);
@@ -115,6 +105,19 @@ namespace ApiGateway.Controllers
 
 
         #region Mantenimiento Tags
+
+        /// <summary>
+        /// Relaciona un modulo a un role
+        /// </summary>        
+        /// <param name="roleModules">Objeto necesario para relacionar un modula a un role</param>                   
+        /// <response code="200">Se relaciono el moudulo a un rol.</response>        
+        /// <response code="400">No se relaciono el moudulo a un rol.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
+        [HttpPost("addRoleModules")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 
         [HttpGet("mantenimientotags/{paginaActual}/{numeroDeFilas}/{tag}/{estatus}/{fecha}")]
         public async Task<IActionResult> GetTags(string? paginaActual, string? numeroDeFilas, string? tag, string? estatus, string? fecha)
@@ -204,8 +207,8 @@ namespace ApiGateway.Controllers
             }
             return BadRequest();
         }
-        #endregion
 
+        #endregion
 
         #region Telepeaje
 
