@@ -216,6 +216,10 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", openApiInfo);
     options.AddSecurityDefinition("Bearer", securityScheme);
     options.AddSecurityRequirement(securityRequirements);
+    // Set the comments path for the Swagger JSON and UI.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
 });
 
 builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
