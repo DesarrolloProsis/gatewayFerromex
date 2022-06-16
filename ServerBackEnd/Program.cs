@@ -22,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var secretKey = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("SecretKey"));
+var reportesBaseAddress = builder.Configuration.GetValue<string>("ReportesBaseAddress");
 var key = new SymmetricSecurityKey(secretKey);
 
 var securityScheme = new OpenApiSecurityScheme()
@@ -71,7 +72,7 @@ builder.Services.AddProblemDetails(setup =>
     .AddProblemDetailsConventions()
 .AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull);
 
-builder.Services.AddHttpClient("Reportes", client => client.BaseAddress = new Uri("http://localhost:7293/"));
+builder.Services.AddHttpClient("Reportes", client => client.BaseAddress = new Uri(reportesBaseAddress));
 
 builder.Services.AddCors();
 
