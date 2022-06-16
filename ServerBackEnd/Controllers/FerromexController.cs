@@ -253,7 +253,7 @@ namespace ApiGateway.Controllers
         #region Telepeaje
 
         /// <summary>
-        /// Obtine una pagiancion de tag aplicando filtros
+        /// Obtine una paginacion de tag aplicando filtros
         /// </summary>        
         /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
         /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
@@ -264,7 +264,7 @@ namespace ApiGateway.Controllers
         /// <response code="200">Se obtiene el objeto para la paginacion de Tags.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
-        /// <returns>Regresa pagiancion de tags</returns>
+        /// <returns>Regresa paginacion de tags</returns>
         [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CrucesPaginacion))]
