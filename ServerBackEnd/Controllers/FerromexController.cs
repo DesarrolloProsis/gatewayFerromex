@@ -22,38 +22,75 @@ namespace ApiGateway.Controllers
         }
         #region Modulos
 
-        // GET: api/<Controller>/module/1
+        /// <summary>
+        /// Obtiene el modulo indicado por el id
+        /// </summary>        
+        /// <param name="id">id del modulo a buscar</param>     
+        /// <returns>Regresa el modulo encontrado con el id.</returns>        
+        /// <response code="200">Se encontro modulo para el id.</response>        
+        /// <response code="400">No se encontro modulo para el id.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
+        /// <returns></returns>
         [HttpGet("module/{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]                
         public async Task<ActionResult<ApiResponse<Module>>> GetModule(int id)
         {
-            //int idInt = 0;
 
-            //if (!string.IsNullOrWhiteSpace(id))
-            //{
-            //    if (!int.TryParse(id.Trim(), out int i))
-            //    {
-            //        throw new ValidationException($"Id incorrecto");
-            //    }
-            //    idInt = i;
-            //}
             return Ok(await _ferromexService.GetModuleAsync(id));
         }
 
-        // GET: api/<Controller>/modules
+        /// <summary>
+        /// Obtiene los modulos asociados a un role
+        /// </summary>        
+        /// <param name="role">Nombre del rol a buscar</param>                
+        /// <response code="200">Se encontro modulos para el role.</response>        
+        /// <response code="400">No se encontro modulos para el role.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
+        /// <returns>Regresa coleccion de modulos asociados a un rol.</returns>     
         [HttpGet("modules")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<ActionResult<ApiResponse<List<Module>>>> GetModules(string? role)
         {
             return Ok(await _ferromexService.GetModulesAsync(role));
         }
 
-        // POST: api/<Controller>/module
+        /// <summary>
+        /// Inserta un nuevo modulo
+        /// </summary>        
+        /// <param name="module">Objeto necesario para insertar un nuevo modulo</param>               
+        /// <response code="200">Se inserto un nuevo modulo.</response>        
+        /// <response code="400">No se inserto el modulo.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
+        /// <returns>Regresa el moudlo creado</returns>
         [HttpPost("module")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<ActionResult<ApiResponse<Module>>> PostModule(Module module)
         {
             return Ok(await _ferromexService.PostModuleAsync(module));
         }
 
+
+        /// <summary>
+        /// Relaciona un modulo a un role
+        /// </summary>        
+        /// <param name="roleModules">Objeto necesario para relacionar un modula a un role</param>                   
+        /// <response code="200">Se relaciono el moudulo a un rol.</response>        
+        /// <response code="400">No se relaciono el moudulo a un rol.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpPost("addRoleModules")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> AddRoleModules(RoleModules roleModules)
         {
             if (ModelState.IsValid)
@@ -69,6 +106,8 @@ namespace ApiGateway.Controllers
         }
 
         #endregion
+
+
         #region Mantenimiento Tags
 
         [HttpGet("mantenimientotags/{paginaActual}/{numeroDeFilas}/{tag}/{estatus}/{fecha}")]
@@ -160,6 +199,8 @@ namespace ApiGateway.Controllers
             return BadRequest();
         }
         #endregion
+
+
         #region Telepeaje
 
         [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}")]
