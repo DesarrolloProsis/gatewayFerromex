@@ -93,14 +93,20 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> AddRoleModules(RoleModules roleModules)
         {
+            //if (ModelState.IsValid)
+            //{
+            //    var result = await _ferromexService.PostRoleModulesAsync(roleModules);
+            //    if (!result.Succeeded)
+            //    {
+            //        return Ok(result);
+            //    }
+            //    return BadRequest();
+            //}
+            //return BadRequest();
             if (ModelState.IsValid)
             {
                 var result = await _ferromexService.PostRoleModulesAsync(roleModules);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                return NoContent();
+                return Ok(result);
             }
             return BadRequest();
         }
