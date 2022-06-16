@@ -467,12 +467,17 @@ namespace ApiGateway.Controllers
                 estatusBool = false;
             }
 
-            var usuarios = await _usuariosService.GetUsuariosAsync(paginaActualInt, numeroDeFilasInt, nombre, estatusBool);
+            
             var count = await _usuariosService.CountUsuariosAsync(nombre, estatusBool);
+            var usuarios = count < numeroDeFilasInt
+                ? await _usuariosService.GetUsuariosAsync(paginaActualInt, count, nombre, estatusBool)
+                : await _usuariosService.GetUsuariosAsync(paginaActualInt, numeroDeFilasInt, nombre, estatusBool);
+
             RespuestaPaginacion respuesta = new()
             {
-                PaginasTotales = paginaActualInt
-            == null ? null : (int?)Math.Ceiling(decimal.Divide(count, numeroDeFilasInt ?? 1)),
+                PaginasTotales = paginaActualInt == null 
+                    ? null 
+                    : (int?)Math.Ceiling(decimal.Divide(count, numeroDeFilasInt ?? 1)),
                 PaginaActual = paginaActualInt,
                 Usuarios = usuarios
             };
@@ -506,11 +511,17 @@ namespace ApiGateway.Controllers
                 estatusBool = false;
             }
 
-            var roles = await _usuariosService.GetRolesAsync(paginaActualInt, numeroDeFilasInt, nombreRol, estatusBool);
+            
+            var countRoles = await _usuariosService.CountRolesAsync(nombreRol, estatusBool);
+            var roles = countRoles < numeroDeFilasInt
+                ? await _usuariosService.GetRolesAsync(paginaActualInt, numeroDeFilasInt, nombreRol, estatusBool)
+                : await _usuariosService.GetRolesAsync(paginaActualInt, numeroDeFilasInt, nombreRol, estatusBool);
+
             RespuestaPaginacion respuesta = new()
             {
-                PaginasTotales = paginaActualInt
-            == null ? null : (int?)Math.Ceiling(decimal.Divide(await _usuariosService.CountRolesAsync(nombreRol, estatusBool), numeroDeFilasInt ?? 1)),
+                PaginasTotales = paginaActualInt == null 
+                    ? null 
+                    : (int?)Math.Ceiling(decimal.Divide(countRoles, numeroDeFilasInt ?? 1)),
                 PaginaActual = paginaActualInt,
                 Roles = roles
             };
