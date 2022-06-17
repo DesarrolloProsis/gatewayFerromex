@@ -103,7 +103,6 @@ namespace ApiGateway.Controllers
 
         #endregion
 
-
         #region Mantenimiento Tags
 
         /// <summary>
@@ -253,7 +252,7 @@ namespace ApiGateway.Controllers
         #region Telepeaje
 
         /// <summary>
-        /// Obtine una pagiancion de tag aplicando filtros
+        /// Obtine una pagiancion de transacciones aplicando filtros
         /// </summary>        
         /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
         /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
@@ -261,7 +260,7 @@ namespace ApiGateway.Controllers
         /// <param name="carril">Numero de carril</param>   
         /// <param name="cuerpo">Cuerpo del carril</param>   
         /// <param name="fecha">Filtro fecha para los tags</param>  
-        /// <response code="200">Se obtiene el objeto para la paginacion de Tags.</response>        
+        /// <response code="200">Se obtiene el objeto para la paginacion de Transacciones.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
         /// <returns>Regresa pagiancion de tags</returns>
@@ -325,13 +324,25 @@ namespace ApiGateway.Controllers
             return Ok(res);
         }
 
+
+
+        /// <summary>
+        /// Obtiene una lista de carriles
+        /// </summary>                           
+        /// <response code="200">Lista de carriles.</response>        
+        /// <response code="400">Sin carriles para mostrar.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpGet("carriles")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> GetLanes()
         {
             var res = await _ferromexService.GetLanesAsync();
             if (res != null)
             {
-                List<Carril> carriles = new();
+                List<Carril> carriles = new();                
                 foreach (var carril in res.Content)
                 {
                     carriles.Add(new() { Id = carril.IdLane, Nombre = carril.Name });
