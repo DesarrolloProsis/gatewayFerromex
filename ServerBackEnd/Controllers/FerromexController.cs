@@ -324,8 +324,6 @@ namespace ApiGateway.Controllers
             return Ok(res);
         }
 
-
-
         /// <summary>
         /// Obtiene una lista de carriles
         /// </summary>                           
