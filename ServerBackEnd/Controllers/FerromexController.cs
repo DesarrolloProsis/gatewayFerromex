@@ -332,7 +332,7 @@ namespace ApiGateway.Controllers
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpGet("carriles")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Carril>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> GetLanes()

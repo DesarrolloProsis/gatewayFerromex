@@ -43,7 +43,7 @@ namespace ApiGateway.Controllers
         [HttpPost("register")]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register(UserCreateCommand createCommand)
@@ -328,7 +328,7 @@ namespace ApiGateway.Controllers
         [HttpPost("login")]
         [Consumes("application/json")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdentityUser))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login(UserLoginCommand loginCommand)
@@ -453,7 +453,7 @@ namespace ApiGateway.Controllers
         /// <returns>Regresa pagiancion de usuarios</returns>
         [HttpGet("user/{paginaActual}/{numeroDeFilas}/{nombre}/{estatus}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]        
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginacion))]        
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetUsuarios(string? paginaActual, string? numeroDeFilas, string? nombre, string? estatus)
         {
@@ -511,7 +511,7 @@ namespace ApiGateway.Controllers
         /// <returns>Regresa pagiancion de roles</returns>
         [HttpGet("roles/{paginaActual}/{numeroDeFilas}/{nombreRol}/{estatus}")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginacion))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> GetRoles(string? paginaActual, string? numeroDeFilas, string? nombreRol, string? estatus)
@@ -567,7 +567,7 @@ namespace ApiGateway.Controllers
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("editRole")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateRole(Rol rol)
@@ -600,7 +600,7 @@ namespace ApiGateway.Controllers
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("editUser")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateUsuario(Usuario usuario)
@@ -627,7 +627,7 @@ namespace ApiGateway.Controllers
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("changePassword")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdatePassword(UsuarioUpdatePassword usuarioUpdatePassword)
