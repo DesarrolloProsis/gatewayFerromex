@@ -27,7 +27,6 @@ namespace ApiGateway.Services
                 UserName = createCommand.Nombre[..3] + Regex.Replace(createCommand.Apellidos, @"\s+", ""),
                 Name = createCommand.Nombre,
                 LastName = createCommand.Apellidos,
-                Matricule = 1,
                 Active = true
             };
             entry.Email = entry.UserName + "@mail.com";

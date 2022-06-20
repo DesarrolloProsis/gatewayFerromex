@@ -36,8 +36,6 @@ namespace ApiGateway.Data
             {
                 entity.Property(e => e.Email).HasMaxLength(256);
 
-                entity.Property(e => e.Matricule).HasColumnName("MATRICULE");
-
                 entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
 
                 entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
