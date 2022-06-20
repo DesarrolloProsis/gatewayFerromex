@@ -43,7 +43,7 @@ namespace ApiGateway.Controllers
         [HttpPost("register")]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register(UserCreateCommand createCommand)
@@ -328,7 +328,7 @@ namespace ApiGateway.Controllers
         [HttpPost("login")]
         [Consumes("application/json")]
         [Produces("application/json", "application/problem+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdentityUser))]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login(UserLoginCommand loginCommand)
@@ -440,7 +440,21 @@ namespace ApiGateway.Controllers
         ///EPs GD
         #region EPs GD
 
+
+        /// <summary>
+        /// Obtine una pagiancion de usuarios aplicando filtros
+        /// </summary>        
+        /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
+        /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
+        /// <param name="nombre">Nombre de usuario</param>   
+        /// <param name="estatus">Estatus del usuario</param>                   
+        /// <response code="200">Se obtiene el objeto para la paginacion de Usuarios.</response>                
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
+        /// <returns>Regresa pagiancion de usuarios</returns>
         [HttpGet("user/{paginaActual}/{numeroDeFilas}/{nombre}/{estatus}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginacion))]        
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetUsuarios(string? paginaActual, string? numeroDeFilas, string? nombre, string? estatus)
         {
             bool? estatusBool = null;
@@ -484,7 +498,22 @@ namespace ApiGateway.Controllers
             return Ok(respuesta);
         }
 
+
+        /// <summary>
+        /// Obtine una pagiancion de rolee aplicando filtros
+        /// </summary>        
+        /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
+        /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
+        /// <param name="nombreRol">Nombre de role</param>   
+        /// <param name="estatus">Estatus del role</param>                   
+        /// <response code="200">Se obtiene el objeto para la paginacion de Roles.</response>                
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
+        /// <returns>Regresa pagiancion de roles</returns>
         [HttpGet("roles/{paginaActual}/{numeroDeFilas}/{nombreRol}/{estatus}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RespuestaPaginacion))]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> GetRoles(string? paginaActual, string? numeroDeFilas, string? nombreRol, string? estatus)
         {
             bool? estatusBool = null;
@@ -528,7 +557,19 @@ namespace ApiGateway.Controllers
             return Ok(respuesta);
         }
 
+
+        /// <summary>
+        /// Actualiza el role
+        /// </summary>        
+        /// <param name="rol">Objeto para actualizar el role</param>   
+        /// <response code="200">Regresa actualizo correctamente el role</response>
+        /// <response code="400">Hubo algun problema al actualizar el role</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("editRole")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateRole(Rol rol)
         {
             try
@@ -550,7 +591,18 @@ namespace ApiGateway.Controllers
         //    return BadRequest();
         //}
 
+        /// <summary>
+        /// Actualiza el usuario
+        /// </summary>        
+        /// <param name="usuario">Objeto para actualizar el usuario</param>   
+        /// <response code="200">Regresa actualizo correctamente el usuario</response>
+        /// <response code="400">Hubo algun problema al actualizar el usuario</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("editUser")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateUsuario(Usuario usuario)
         {
             try
@@ -566,7 +618,18 @@ namespace ApiGateway.Controllers
             }
         }
 
+        /// <summary>
+        /// Cambia la contraseña del usuairo
+        /// </summary>        
+        /// <param name="usuarioUpdatePassword">Objeto para actualizar la contraseña del usuario</param>   
+        /// <response code="200">Regresa actualizo correctamente la contraseña</response>
+        /// <response code="400">Hubo algun problema al actualizar la contraseña</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPut("changePassword")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Respuesta))]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdatePassword(UsuarioUpdatePassword usuarioUpdatePassword)
         {
             try
