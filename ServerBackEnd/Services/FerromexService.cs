@@ -155,7 +155,7 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
         }
-        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, string? estatus, DateTime? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha)
         {
             Dictionary<string, string> parameters = new();
 
@@ -163,16 +163,16 @@ namespace ApiGateway.Services
             {
                 parameters.Add("tag", tag);
             }
-            if (!string.IsNullOrEmpty(estatus))
+            if (estatus != null)
             {
-                parameters.Add("estatus", estatus);
+                parameters.Add("estatus", Convert.ToString(estatus));
             }
             if (fecha != null)
             {
                 parameters.Add("fecha", Convert.ToString(fecha));
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/MantenimientoTags");
         }
         public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha)
         {

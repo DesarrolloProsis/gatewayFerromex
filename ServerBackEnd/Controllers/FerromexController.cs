@@ -287,10 +287,10 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadMantenimientoTags(string tag, string estatus, string fecha)
+        public async Task<IActionResult> DownloadMantenimientoTags(string tag, bool estatus, string fecha)
         {
             tag = GetNullableString(tag);
-            estatus = GetNullableString(estatus);
+
             DateTime? fechaDt = null;
 
             if (!string.IsNullOrWhiteSpace(fecha))
@@ -305,31 +305,49 @@ namespace ApiGateway.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }
+            else
+            {
+                return File(result.Content, "application/pdf", "MantenimientoTags.pdf");
+            }
+
             return NoContent();
         }
 
-        [HttpGet("Download/pdf/reporteOperativo/reporteCajero")]
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadReporteOperativoCajero(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoCajero(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
         {
-            if (ModelState.IsValid)
+            fecha = GetNullableString(fecha);
+
+            int idBolsaIn = 0, numeroCajeroIn = 0, turnoIn = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno))
             {
-                var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(IdBolsa, numeroBolsa, turno, fecha);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                else
-                {
-                    return File(result.Content, "application/pdf", "ReporteCajero.pdf");
-                }
-                return NoContent();
+                turnoIn = Convert.ToInt16(turno);
             }
-            return BadRequest();
+            if (!string.IsNullOrWhiteSpace(numeroCajero))
+            {
+                numeroCajeroIn = Convert.ToInt16(numeroCajero);
+            }
+            if (!string.IsNullOrWhiteSpace(idBolsa))
+            {
+                idBolsaIn = Convert.ToInt16(idBolsa);
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(idBolsaIn, numeroCajeroIn, turnoIn, fecha);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "ReporteCajero.pdf");
+            }
+            return NoContent();
         }
 
         [HttpGet("Download/pdf/reporteOperativo/reporteTurno/{turno}/{fecha}")]
