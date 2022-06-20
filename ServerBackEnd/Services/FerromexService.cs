@@ -153,5 +153,141 @@ namespace ApiGateway.Services
             return await GetAsync<int>(path: "transactionsCount", parameters: parameters);
         }
 
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(string? dia, string? mes, string? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(dia))
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (!string.IsNullOrEmpty(semana))
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(dia))
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (!string.IsNullOrEmpty(semana))
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(dia))
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (!string.IsNullOrEmpty(semana))
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            if (estatus != null)
+            {
+                parameters.Add("estatus", Convert.ToString(estatus));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/MantenimientoTags");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (IdBolsa != null)
+            {
+                parameters.Add("IdBolsa", Convert.ToString(IdBolsa));
+            }
+            if (numeroBolsa != null)
+            {
+                parameters.Add("numeroBolsa", Convert.ToString(numeroBolsa));
+            }
+            if (turno != null)
+            {
+                parameters.Add("turno", Convert.ToString(turno));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCajero");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (turno != null)
+            {
+                parameters.Add("turno", Convert.ToString(turno));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesDetalle");
+        }
+        public async Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(numeroCajero))
+            {
+                parameters.Add("NumCajero", numeroCajero);
+            }
+            if (turno != null)
+            {
+                parameters.Add("turno", Convert.ToString(turno));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+            return await GetAsync<List<Bolsas>>(parameters: parameters, path: "/GetBolsas");
+        }
     }
 }
+

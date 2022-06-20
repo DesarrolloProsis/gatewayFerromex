@@ -1,4 +1,5 @@
-﻿using ReportesData.Models;
+﻿using ApiGateway.Models;
+using ReportesData.Models;
 using Shared;
 
 namespace ApiGateway.Interfaces
@@ -14,6 +15,13 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse> UpdateTagAsync(TagList tag);
         Task<ApiResponse<TagList>> CreateTagAsync(TagList tag);
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha);
+        Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
         Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha);
         Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha);

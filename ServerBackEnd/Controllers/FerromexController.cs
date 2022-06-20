@@ -248,6 +248,207 @@ namespace ApiGateway.Controllers
         }
 
         #endregion
+        #region Reportes
+
+        [HttpGet("Download/pdf/crucestotales/reporteCruces/{dia}/{mes}/{semana}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadReporteCrucesTotales(string? dia, string? mes, string? semana)
+        {
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadReporteCrucesTotalesAsync(dia, mes, semana);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "CrucesTotales.pdf");
+            }
+            return NoContent();
+        }
+
+        [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadReporteCrucesFerromex(string? dia, string? mes, string? semana)
+        {
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadReporteCrucesFerromexAsync(dia, mes, semana);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "CrucesFerromex.pdf");
+            }
+            return NoContent();
+        }
+
+        [HttpGet("Download/pdf/concentradosferromex/{dia}/{mes}/{semana}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadConcentradosFerromex(string? dia, string? mes, string? semana)
+        {
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadConcentradosFerromexAsync(dia, mes, semana);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "ConcentradosFerromex.pdf");
+            }
+            return NoContent();
+        }
+
+        [HttpGet("Download/pdf/mantenimientotags/{tag}/{estatus}/{fecha}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadMantenimientoTags(string tag, bool estatus, string fecha)
+        {
+            tag = GetNullableString(tag);
+
+            DateTime? fechaDt = null;
+
+            if (!string.IsNullOrWhiteSpace(fecha))
+            {
+                if (!DateTime.TryParse(fecha, out DateTime dt))
+                    return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
+                fechaDt = dt;
+            }
+
+            var result = await _ferromexService.DownloadMantenimientoTagsAsync(tag, estatus, fechaDt);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "MantenimientoTags.pdf");
+            }
+
+            return NoContent();
+        }
+
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadReporteOperativoCajero(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
+        {
+            fecha = GetNullableString(fecha);
+
+            int idBolsaIn = 0, numeroCajeroIn = 0, turnoIn = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno))
+            {
+                turnoIn = Convert.ToInt16(turno);
+            }
+            if (!string.IsNullOrWhiteSpace(numeroCajero))
+            {
+                numeroCajeroIn = Convert.ToInt16(numeroCajero);
+            }
+            if (!string.IsNullOrWhiteSpace(idBolsa))
+            {
+                idBolsaIn = Convert.ToInt16(idBolsa);
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(idBolsaIn, numeroCajeroIn, turnoIn, fecha);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "ReporteCajero.pdf");
+            }
+            return NoContent();
+        }
+
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/{turno}/{fecha}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DownloadReporteOperativoTurno(string? turno, string? fecha)
+        {
+            turno = GetNullableString(turno);
+            fecha = GetNullableString(fecha);
+
+            int turnoI = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno))
+            {
+                turnoI = Convert.ToInt16(turno);
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                var result = await _ferromexService.DownloadReporteOperativoTurnoAsync(turnoI, fecha);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+                else
+                {
+                    return File(result.Content, "application/pdf", "ReporteTurno.pdf");
+                }
+                return NoContent();
+            }
+            return BadRequest();
+        }
+
+        [HttpGet("Download/reportecajero/bolsascajero/{numeroCajero}/{turno}/{fecha}")]
+        [Produces("application/json", "application/problem+json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GeneracionBolsas(string numeroCajero, int turno, DateTime fecha)
+        {
+            var result = await _ferromexService.GeneracionBolsasAsync(numeroCajero, turno, fecha);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            else
+            {
+                return Ok(result);
+            }
+
+            return NoContent();
+        }
+
+        #endregion
 
         #region Telepeaje
 
