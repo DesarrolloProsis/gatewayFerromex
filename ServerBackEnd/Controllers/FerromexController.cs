@@ -209,7 +209,7 @@ namespace ApiGateway.Controllers
         #endregion
         #region Reportes
 
-        [HttpGet("Download/pdf/crucestotales/reporteCruces")]
+        [HttpGet("Download/pdf/crucestotales/reporteCruces/{dia}/{mes}/{semana}")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -217,23 +217,23 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteCrucesTotales(string? dia, string? mes, string? semana)
         {
-            if (ModelState.IsValid)
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadReporteCrucesTotalesAsync(dia, mes, semana);
+            if (!result.Succeeded)
             {
-                var result = await _ferromexService.DownloadReporteCrucesTotalesAsync(dia, mes, semana);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                else
-                {
-                    return File(result.Content, "application/pdf", "CrucesTotales.pdf");
-                }
-                return NoContent();
+                return BadRequest(result.ErrorMessage);
             }
-            return BadRequest();
+            else
+            {
+                return File(result.Content, "application/pdf", "CrucesTotales.pdf");
+            }
+            return NoContent();
         }
 
-        [HttpGet("Download/pdf/crucesferromex")]
+        [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana}")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -241,23 +241,23 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteCrucesFerromex(string? dia, string? mes, string? semana)
         {
-            if (ModelState.IsValid)
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadReporteCrucesFerromexAsync(dia, mes, semana);
+            if (!result.Succeeded)
             {
-                var result = await _ferromexService.DownloadReporteCrucesFerromexAsync(dia, mes, semana);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                else
-                {
-                    return File(result.Content, "application/pdf", "CrucesFerromex.pdf");
-                }
-                return NoContent();
+                return BadRequest(result.ErrorMessage);
             }
-            return BadRequest();
+            else
+            {
+                return File(result.Content, "application/pdf", "CrucesFerromex.pdf");
+            }
+            return NoContent();
         }
 
-        [HttpGet("Download/pdf/concentradosferromex")]
+        [HttpGet("Download/pdf/concentradosferromex/{dia}/{mes}/{semana}")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -265,20 +265,20 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadConcentradosFerromex(string? dia, string? mes, string? semana)
         {
-            if (ModelState.IsValid)
+            dia = GetNullableString(dia);
+            mes = GetNullableString(mes);
+            semana = GetNullableString(semana);
+
+            var result = await _ferromexService.DownloadConcentradosFerromexAsync(dia, mes, semana);
+            if (!result.Succeeded)
             {
-                var result = await _ferromexService.DownloadConcentradosFerromexAsync(dia, mes, semana);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                else
-                {
-                    return File(result.Content, "application/pdf", "ConcentradosFerromex.pdf");
-                }
-                return NoContent();
+                return BadRequest(result.ErrorMessage);
             }
-            return BadRequest();
+            else
+            {
+                return File(result.Content, "application/pdf", "ConcentradosFerromex.pdf");
+            }
+            return NoContent();
         }
 
         [HttpGet("Download/pdf/mantenimientotags/{tag}/{estatus}/{fecha}")]
@@ -287,18 +287,25 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadMantenimientoTags(string tag, string estatus, DateTime fecha)
+        public async Task<IActionResult> DownloadMantenimientoTags(string tag, string estatus, string fecha)
         {
-            if (ModelState.IsValid)
+            tag = GetNullableString(tag);
+            estatus = GetNullableString(estatus);
+            DateTime? fechaDt = null;
+
+            if (!string.IsNullOrWhiteSpace(fecha))
             {
-                var result = await _ferromexService.DownloadMantenimientoTagsAsync(tag, estatus, fecha);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                return NoContent();
+                if (!DateTime.TryParse(fecha, out DateTime dt))
+                    return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
+                fechaDt = dt;
             }
-            return BadRequest();
+
+            var result = await _ferromexService.DownloadMantenimientoTagsAsync(tag, estatus, fechaDt);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return NoContent();
         }
 
         [HttpGet("Download/pdf/reporteOperativo/reporteCajero")]
@@ -325,17 +332,28 @@ namespace ApiGateway.Controllers
             return BadRequest();
         }
 
-        [HttpGet("Download/pdf/reporteOperativo/reporteTurno")]
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/{turno}/{fecha}")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadReporteOperativoTurno(int? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoTurno(string? turno, string? fecha)
         {
+            turno = GetNullableString(turno);
+            fecha = GetNullableString(fecha);
+
+            int turnoI = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno))
+            {
+                turnoI = Convert.ToInt16(turno);
+            }
+
+
             if (ModelState.IsValid)
             {
-                var result = await _ferromexService.DownloadReporteOperativoTurnoAsync(turno, fecha);
+                var result = await _ferromexService.DownloadReporteOperativoTurnoAsync(turnoI, fecha);
                 if (!result.Succeeded)
                 {
                     return BadRequest(result.ErrorMessage);
@@ -357,20 +375,18 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GeneracionBolsas(string numeroCajero, int turno, DateTime fecha)
         {
-            if (ModelState.IsValid)
+            var result = await _ferromexService.GeneracionBolsasAsync(numeroCajero, turno, fecha);
+
+            if (!result.Succeeded)
             {
-                var result = await _ferromexService.GeneracionBolsasAsync(numeroCajero, turno, fecha);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.ErrorMessage);
-                }
-                else
-                {
-                    return Ok(result);
-                }
-                return NoContent();
+                return BadRequest(result.ErrorMessage);
             }
-            return BadRequest();
+            else
+            {
+                return Ok(result);
+            }
+
+            return NoContent();
         }
 
         #endregion
