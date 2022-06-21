@@ -20,7 +20,8 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = "Server=10.1.1.49;Database=BackOfficeFerromex;User=PROSIS_DEV;Password=Pr0$1$D3v;MultipleActiveResultSets=true";
 var secretKey = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("SecretKey"));
 var reportesBaseAddress = builder.Configuration.GetValue<string>("ReportesBaseAddress");
 var key = new SymmetricSecurityKey(secretKey);
@@ -224,8 +225,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
 
-builder.Services.AddHostedService<Worker>();
-builder.Services.AddScoped<IReportesService, ReportesService>();
+//builder.Services.AddHostedService<Worker>();
 builder.Services.AddScoped<IFerromexService, FerromexService>();
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 

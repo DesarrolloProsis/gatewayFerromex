@@ -6,11 +6,12 @@ using ReportesData.Models;
 using Shared;
 using System.Globalization;
 using System.Net.Mime;
+using System.Security.Claims;
 
 namespace ApiGateway.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class FerromexController : ControllerBase
     {
@@ -43,11 +44,11 @@ namespace ApiGateway.Controllers
         }
 
         /// <summary>
-        /// Obtiene los modulos asociados a un role
+        /// Obtiene los modulos asociados a un rol
         /// </summary>        
-        /// <param name="role">Nombre del rol a buscar</param>                
-        /// <response code="200">Se encontro modulos para el role.</response>        
-        /// <response code="400">No se encontro modulos para el role.</response>
+        /// <param name="roleName">Nombre del rol a buscar</param>                
+        /// <response code="200">Se encontro modulos para el rol.</response>        
+        /// <response code="400">No se encontro modulos para el rol.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>
         /// <returns>Regresa coleccion de modulos asociados a un rol.</returns>     
         [HttpGet("modules")]
@@ -55,9 +56,9 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
-        public async Task<ActionResult<ApiResponse<List<Module>>>> GetModules(string? role)
+        public async Task<ActionResult<ApiResponse<List<Module>>>> GetModules(string? roleName)
         {
-            return Ok(await _ferromexService.GetModulesAsync(role));
+            return Ok(await _ferromexService.GetModulesAsync(roleName));
         }
 
         /// <summary>
@@ -80,25 +81,26 @@ namespace ApiGateway.Controllers
 
 
         /// <summary>
-        /// Relaciona un modulo a un role
+        /// Relaciona un modulo a un rol
         /// </summary>        
-        /// <param name="roleModules">Objeto necesario para relacionar un modula a un role</param>                   
+        /// <param name="roleModules">Objeto necesario para relacionar un modulo a un role</param>                   
         /// <response code="200">Se relaciono el moudulo a un rol.</response>        
-        /// <response code="400">No se relaciono el moudulo a un rol.</response>
+        /// <response code="400">No se relaciono el modulo a un rol.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpPost("addRoleModules")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
+        [ProducesResponseType(typeof(ApiResponse<Module>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddRoleModules(RoleModules roleModules)
         {    
             if (ModelState.IsValid)
             {
                 var result = await _ferromexService.PostRoleModulesAsync(roleModules);
+                if(result.Succeeded) return Ok(result);
                 return Ok(result);
             }
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         #endregion
@@ -106,7 +108,7 @@ namespace ApiGateway.Controllers
         #region Mantenimiento Tags
 
         /// <summary>
-        /// Obtine una pagiancion de tag aplicando filtros
+        /// Obtiene una paginacion de tag aplicando filtros
         /// </summary>        
         /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
         /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
@@ -191,16 +193,17 @@ namespace ApiGateway.Controllers
         [HttpPost("agregartag")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> CreateTag(TagList tag)
         {
+            tag.IdUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.CreateTagAsync(tag);
                 if (res.Succeeded) return NoContent();
             }
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -211,25 +214,26 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpPut("editartag")]
-        [Produces("application/json")]
+        [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
         public async Task<IActionResult> UpdateTag(TagList tag)
         {
+            tag.IdUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (ModelState.IsValid)
             {
                 var res = await _ferromexService.UpdateTagAsync(tag);
                 if (res.Succeeded) return NoContent();               
             }
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         /// <summary>
         /// Elimina un tag en especifico
         /// </summary>        
         /// <param name="tag">Objeto necesario para eliminar el tag</param>               
-        /// <response code="204">Se inserto un nuevo tag.</response>        
+        /// <response code="204">Se elimino el tag.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpDelete("eliminartag/{tag}")]
@@ -243,6 +247,7 @@ namespace ApiGateway.Controllers
             {
                 var res = await _ferromexService.DeleteTagAsync(tag);
                 if (res.Succeeded) return NoContent();
+                return BadRequest(res.ErrorMessage);
             }
             return BadRequest();
         }
