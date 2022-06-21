@@ -256,7 +256,7 @@ namespace ApiGateway.Controllers
         #region Reportes
 
         [HttpGet("Download/pdf/crucestotales/reporteCruces/{dia}/{mes}/{semana}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/PDF")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -339,7 +339,7 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DownloadMantenimientoTags(string? tag, bool? estatus, string? fecha)
+        public async Task<IActionResult> DownloadMantenimientoTags(string? tag, string? estatus, string? fecha)
         {
             tag = GetNullableString(tag); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
 
@@ -352,7 +352,20 @@ namespace ApiGateway.Controllers
                 fechaDt = dt; //Si no esta en formato incorrecto, se guarda la fecha en una variable dateTime
             }
 
-            var result = await _ferromexService.DownloadMantenimientoTagsAsync(tag, estatus, fechaDt); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            bool? estatusBool = null;
+
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("ACTIVO") //Se comprueba si lo recibido por el usuario no es un espacio en blanco y si el string recibido entra en algunos de esos parametros
+               || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("TRUE"))
+            {
+                estatusBool = true;
+            }
+            if (!string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("INACTIVO") //Se comprueba si lo recibido por el usuario no es un espacio en blanco y si el string recibido entra en algunos de esos parametros
+                || !string.IsNullOrWhiteSpace(estatus) && estatus.Trim().ToUpper().Equals("FALSE"))
+            {
+                estatusBool = false;
+            }
+
+            var result = await _ferromexService.DownloadMantenimientoTagsAsync(tag, estatusBool, fechaDt); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
