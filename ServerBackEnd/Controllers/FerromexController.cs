@@ -250,12 +250,21 @@ namespace ApiGateway.Controllers
         #endregion
         #region Reportes
 
+        /// <summary>
+        /// Obtiene el Reporte de cruces totales en formato PDF
+        /// </summary>
+        /// <param name="dia">Ej. 2022-06-21</param>
+        /// <param name="mes">Ej. 2022-06</param>
+        /// <param name="semana">Ej. 2022-W24</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/crucestotales/reporteCruces/{dia}/{mes}/{semana}")]
-        [Produces("application/PDF")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteCrucesTotales(string? dia, string? mes, string? semana)
         {
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
@@ -276,12 +285,21 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene el reporte de los cruces de feromex en formato PDF
+        /// </summary>
+        /// <param name="dia">Ej. 2022-06-21</param>
+        /// <param name="mes">Ej. 2022-06</param>
+        /// <param name="semana">Ej. 2022-W24</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]       
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteCrucesFerromex(string? dia, string? mes, string? semana)
         {
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
@@ -302,12 +320,21 @@ namespace ApiGateway.Controllers
             return NoContent();  //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene el reporte de los cruces de feromex concentrados en formato PDF
+        /// </summary>
+        /// <param name="dia"></param>
+        /// <param name="mes"></param>
+        /// <param name="semana"></param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/concentradosferromex/{dia}/{mes}/{semana}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadConcentradosFerromex(string? dia, string? mes, string? semana)
         {
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
@@ -328,17 +355,26 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene el reporte de los mantenimientos de tags en formato PDF
+        /// </summary>
+        /// <param name="tag">Ej.IMDM22961475</param>
+        /// <param name="estatus">Ej. ACTIVO o INACTIVO</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/mantenimientotags/{tag}/{estatus}/{fecha}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadMantenimientoTags(string? tag, string? estatus, string? fecha)
         {
             tag = GetNullableString(tag); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
 
-            DateTime? fechaDt = null; 
+            DateTime? fechaDt = null;
 
             if (!string.IsNullOrWhiteSpace(fecha)) //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             {
@@ -374,17 +410,27 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene el reporte del reporte operativo de cajero en formato PDF
+        /// </summary>
+        /// <param name="idBolsa">Ej. B0420044</param>
+        /// <param name="numeroCajero">Ej. 555555</param>
+        /// <param name="turno">Ej. Ej. 1, 2 o 3</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/reporteOperativo/reporteCajero/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteOperativoCajero(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
         {
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
 
-            int idBolsaIn = 0, numeroCajeroIn = 0, turnoIn = 0; 
+            int idBolsaIn = 0, numeroCajeroIn = 0, turnoIn = 0;
 
             if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
             {
@@ -413,12 +459,20 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene el reporte del reporte operativo de turno en formato PDF
+        /// </summary>
+        /// <param name="turno">Ej. Ej. 1, 2 o 3</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/reporteOperativo/reporteTurno/{turno}/{fecha}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DownloadReporteOperativoTurno(string? turno, string? fecha)
         {
             turno = GetNullableString(turno); //Se comprueba si lo que se obtuvo no es un espacio en blanco
@@ -445,12 +499,21 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        /// <summary>
+        /// Obtiene las bolsas correspondientes al cajero y turno indicado
+        /// </summary>
+        /// <param name="numeroCajero">Ej. 555555</param>
+        /// <param name="turno">Ej. 1, 2 o 3</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene las bolsas</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response> 
+        /// <returns>Se obtiene las bolsas con sus correspondientes datos, con ayuda de los anteriores filtros indicados anteriormente</returns>
         [HttpGet("Download/reportecajero/bolsascajero/{numeroCajero}/{turno}/{fecha}")]
-        [Produces("application/json", "application/problem+json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GeneracionBolsas(string? numeroCajero, string? turno, string? fecha)
         {
             int turnoI = 0;
