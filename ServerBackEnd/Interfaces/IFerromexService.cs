@@ -19,7 +19,7 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, int? numeroBolsa, int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha);
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha);
         Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();

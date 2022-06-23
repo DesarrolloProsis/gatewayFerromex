@@ -7,11 +7,13 @@ using Shared;
 using System.Globalization;
 using System.Net.Mime;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace ApiGateway.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
+    [AllowAnonymous]
     [ApiController]
     public class FerromexController : ControllerBase
     {
@@ -55,7 +57,7 @@ namespace ApiGateway.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Module>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<Module>))]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<List<Module>>>> GetModules(string? roleName)
         {
             return Ok(await _ferromexService.GetModulesAsync(roleName));
@@ -97,7 +99,7 @@ namespace ApiGateway.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _ferromexService.PostRoleModulesAsync(roleModules);
-                if(result.Succeeded) return Ok(result);
+                if (result.Succeeded) return Ok(result);
                 return Ok(result);
             }
             return BadRequest(ModelState);
@@ -194,7 +196,7 @@ namespace ApiGateway.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateTag(TagList tag)
         {
             tag.IdUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -217,7 +219,7 @@ namespace ApiGateway.Controllers
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]        
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateTag(TagList tag)
         {
             tag.IdUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -271,16 +273,46 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DownloadReporteCrucesTotales(string? dia, string? mes, string? semana)
-        {
+        {         
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             semana = GetNullableString(semana); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (dia != null)
+            {
+                if (Regex.IsMatch(dia, patternDia) == false)
+                {
+                    return BadRequest("El dia se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternMes = @"(19|20)\d\d[-/.](0[1-9]|1[012])";
+
+            if (mes != null)
+            {
+                if (Regex.IsMatch(mes, patternMes) == false)
+                {
+                    return BadRequest("El mes se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternSemana = @"(19|20)\d\d[-/.](W0[1-9]|W1[0-9]|W2[0-9]|W3[0-9]|W4[0-9]|W5[0-3])";
+
+            if (semana != null)
+            {
+                if (Regex.IsMatch(semana, patternSemana) == false)
+                {
+                    return BadRequest("La semana se encuentra en un formato incorrecto");
+                }
+            }
 
             var result = await _ferromexService.DownloadReporteCrucesTotalesAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -302,7 +334,7 @@ namespace ApiGateway.Controllers
         /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana}")]
         [Produces("application/pdf")]
-        [ProducesResponseType(StatusCodes.Status200OK)]       
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DownloadReporteCrucesFerromex(string? dia, string? mes, string? semana)
@@ -311,11 +343,41 @@ namespace ApiGateway.Controllers
             mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             semana = GetNullableString(semana); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
 
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (dia != null)
+            {
+                if (Regex.IsMatch(dia, patternDia) == false)
+                {
+                    return BadRequest("El dia se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternMes = @"(19|20)\d\d[-/.](0[1-9]|1[012])";
+
+            if (mes != null)
+            {
+                if (Regex.IsMatch(mes, patternMes) == false)
+                {
+                    return BadRequest("El mes se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternSemana = @"(19|20)\d\d[-/.](W0[1-9]|W1[0-9]|W2[0-9]|W3[0-9]|W4[0-9]|W5[0-3])";
+
+            if (semana != null)
+            {
+                if (Regex.IsMatch(semana, patternSemana) == false)
+                {
+                    return BadRequest("La semana se encuentra en un formato incorrecto");
+                }
+            }
+
             var result = await _ferromexService.DownloadReporteCrucesFerromexAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -328,9 +390,9 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el reporte de los cruces de feromex concentrados en formato PDF
         /// </summary>
-        /// <param name="dia"></param>
-        /// <param name="mes"></param>
-        /// <param name="semana"></param>
+        /// <param name="dia">Ej. 2022-06-21</param>
+        /// <param name="mes">Ej. 2022-06</param>
+        /// <param name="semana">Ej. 2022-W24</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
@@ -346,11 +408,41 @@ namespace ApiGateway.Controllers
             mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             semana = GetNullableString(semana); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
 
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (dia != null)
+            {
+                if (Regex.IsMatch(dia, patternDia) == false)
+                {
+                    return BadRequest("El dia se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternMes = @"(19|20)\d\d[-/.](0[1-9]|1[012])";
+
+            if (mes != null)
+            {
+                if (Regex.IsMatch(mes, patternMes) == false)
+                {
+                    return BadRequest("El mes se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternSemana = @"(19|20)\d\d[-/.](W0[1-9]|W1[0-9]|W2[0-9]|W3[0-9]|W4[0-9]|W5[0-3])";
+
+            if (semana != null)
+            {
+                if (Regex.IsMatch(semana, patternSemana) == false)
+                {
+                    return BadRequest("La semana se encuentra en un formato incorrecto");
+                }
+            }
+
             var result = await _ferromexService.DownloadConcentradosFerromexAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -405,7 +497,7 @@ namespace ApiGateway.Controllers
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -418,9 +510,9 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el reporte del reporte operativo de cajero en formato PDF
         /// </summary>
-        /// <param name="idBolsa">Ej. B0420044</param>
+        /// <param name="idBolsa">Ej. 1</param>
         /// <param name="numeroCajero">Ej. 555555</param>
-        /// <param name="turno">Ej. Ej. 1, 2 o 3</param>
+        /// <param name="turno">Ej. 1, 2 o 3</param>
         /// <param name="fecha">Ej. 2022-06-22</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
@@ -435,26 +527,34 @@ namespace ApiGateway.Controllers
         {
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
 
-            int idBolsaIn = 0, numeroCajeroIn = 0, turnoIn = 0;
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
+            numeroCajero = GetNullableString(numeroCajero); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+
+            int idBolsaIn = 0, turnoIn = 0;
 
             if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
             {
                 turnoIn = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
-            }
-            if (!string.IsNullOrWhiteSpace(numeroCajero)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
-            {
-                numeroCajeroIn = Convert.ToInt16(numeroCajero); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
             if (!string.IsNullOrWhiteSpace(idBolsa)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
             {
                 idBolsaIn = Convert.ToInt16(idBolsa); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
 
-            var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(idBolsaIn, numeroCajeroIn, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -467,7 +567,7 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el reporte del reporte operativo de turno en formato PDF
         /// </summary>
-        /// <param name="turno">Ej. Ej. 1, 2 o 3</param>
+        /// <param name="turno">Ej. 1, 2 o 3</param>
         /// <param name="fecha">Ej. 2022-06-22</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
@@ -483,6 +583,16 @@ namespace ApiGateway.Controllers
             turno = GetNullableString(turno); //Se comprueba si lo que se obtuvo no es un espacio en blanco
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
 
+             string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
             int turnoI = 0;
 
             if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
@@ -494,7 +604,7 @@ namespace ApiGateway.Controllers
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
@@ -541,7 +651,7 @@ namespace ApiGateway.Controllers
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
-                return BadRequest(result.ErrorMessage); //Se devuelve al usuario un badRequest y el mensaje del error
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
             }
             else
             {
