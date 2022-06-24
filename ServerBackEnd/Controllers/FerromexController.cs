@@ -260,6 +260,12 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el Reporte de cruces totales en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>dia   2022-06-21</para>
+        /// <para>mes   2022-06</para>
+        /// <para>semana    2022-W26</para>
+        /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
         /// <param name="semana">Ej. 2022-W24</param>
@@ -323,21 +329,27 @@ namespace ApiGateway.Controllers
         }
 
         /// <summary>
-        /// Obtiene el reporte de los cruces de feromex en formato PDF
+        /// Obtiene el reporte de los cruces de feromex con descuento detalle en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>dia	2022-06-21</para>
+        /// <para>mes   2022-06</para>
+        /// <para>semana    2022-W26</para>
+        /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
         /// <param name="semana">Ej. 2022-W24</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
-        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana}")]
+        /// <returns>Se obtienen los cruces ferromex con descuento filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/crucesferromex/descuentodetallesamarre/{dia}/{mes}/{semana}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteCrucesFerromex(string? dia, string? mes, string? semana)
+        public async Task<IActionResult> DownloadReporteCrucesFerromexDescuentoDetalle(string? dia, string? mes, string? semana)
         {
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
@@ -373,7 +385,78 @@ namespace ApiGateway.Controllers
                 }
             }
 
-            var result = await _ferromexService.DownloadReporteCrucesFerromexAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteCrucesFerromexDescuentoDetalleAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+
+            if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
+            {
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "CrucesFerromex.pdf"); //Se devuelve al usuario el PDF requerido
+            }
+
+            return NoContent();  //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
+        }
+
+        /// <summary>
+        /// Obtiene el reporte de los cruces de feromex con descuento resumen en formato PDF
+        /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>dia	2022-06-21</para>
+        /// <para>mes   2022-06</para>
+        /// <para>semana    2022-W26</para>
+        /// </remarks>
+        /// <param name="dia">Ej. 2022-06-21</param>
+        /// <param name="mes">Ej. 2022-06</param>
+        /// <param name="semana">Ej. 2022-W24</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtienen los cruces ferromex con descuento filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/crucesferromex/descuentoamarreresumen/{dia}/{mes}/{semana}")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DownloadReporteCrucesFerromexDescuentoResumen(string? dia, string? mes, string? semana)
+        {
+            dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
+            mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
+            semana = GetNullableString(semana); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (dia != null)
+            {
+                if (Regex.IsMatch(dia, patternDia) == false)
+                {
+                    return BadRequest("El dia se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternMes = @"(19|20)\d\d[-/.](0[1-9]|1[012])";
+
+            if (mes != null)
+            {
+                if (Regex.IsMatch(mes, patternMes) == false)
+                {
+                    return BadRequest("El mes se encuentra en un formato incorrecto");
+                }
+            }
+
+            string patternSemana = @"(19|20)\d\d[-/.](W0[1-9]|W1[0-9]|W2[0-9]|W3[0-9]|W4[0-9]|W5[0-3])";
+
+            if (semana != null)
+            {
+                if (Regex.IsMatch(semana, patternSemana) == false)
+                {
+                    return BadRequest("La semana se encuentra en un formato incorrecto");
+                }
+            }
+
+            var result = await _ferromexService.DownloadReporteCrucesFerromexDescuentoResumenAsync(dia, mes, semana); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -390,13 +473,19 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el reporte de los cruces de feromex concentrados en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>dia	2022-06-21</para>
+        /// <para>mes   2022-06</para>
+        /// <para>semana    2022-W26</para>
+        /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
         /// <param name="semana">Ej. 2022-W24</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
-        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        /// <returns>Se obtiene un concentrado de los cruces ferromex filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/concentradosferromex/{dia}/{mes}/{semana}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -455,13 +544,19 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene el reporte de los mantenimientos de tags en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>tag	CPFI01376954</para>
+        /// <para>estatus	ACTIVO</para>
+        /// <para>fecha	2022-06-01</para>
+        /// </remarks>
         /// <param name="tag">Ej.IMDM22961475</param>
         /// <param name="estatus">Ej. ACTIVO o INACTIVO</param>
         /// <param name="fecha">Ej. 2022-06-22</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
-        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        /// <returns>Se obtienen los tags en mantenimiento filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
         [HttpGet("Download/pdf/mantenimientotags/{tag}/{estatus}/{fecha}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -508,8 +603,15 @@ namespace ApiGateway.Controllers
         }
 
         /// <summary>
-        /// Obtiene el reporte del reporte operativo de cajero en formato PDF
+        /// Obtiene el reporte del reporte operativo de cajero concentrado en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>IdBolsa	7</para>
+        /// <para>numeroCajero	12312</para>
+        /// <para>turno	2</para>
+        /// <para>fecha	2022-05-05</para>
+        /// </remarks>
         /// <param name="idBolsa">Ej. 1</param>
         /// <param name="numeroCajero">Ej. 555555</param>
         /// <param name="turno">Ej. 1, 2 o 3</param>
@@ -517,13 +619,13 @@ namespace ApiGateway.Controllers
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
-        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
+        /// <returns>Se obtiene un concentrado del cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/concentrado/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoCajero(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoCajeroConcentrado(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
         {
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
 
@@ -550,7 +652,7 @@ namespace ApiGateway.Controllers
                 idBolsaIn = Convert.ToInt16(idBolsa); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
 
-            var result = await _ferromexService.DownloadReporteOperativoCajeroAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteOperativoCajeroConcentradoAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -565,20 +667,88 @@ namespace ApiGateway.Controllers
         }
 
         /// <summary>
-        /// Obtiene el reporte del reporte operativo de turno en formato PDF
+        /// Obtiene el reporte del reporte operativo de cajero transacciones en formato PDF
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
+        /// <para>IdBolsa	7</para>
+        /// <para>numeroCajero	12312</para>
+        /// <para>turno	2</para>
+        /// <para>fecha	2022-05-05</para>
+        /// </remarks>
+        /// <param name="idBolsa">Ej. 1</param>
+        /// <param name="numeroCajero">Ej. 555555</param>
         /// <param name="turno">Ej. 1, 2 o 3</param>
         /// <param name="fecha">Ej. 2022-06-22</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
-        /// <returns>Se obtienen los cruces totales filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/{turno}/{fecha}")]
+        /// <returns>Se obtienen los cruces totales que hizo ese cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/transacciones/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoTurno(string? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoCajeroTransacciones(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
+        {
+            fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
+            numeroCajero = GetNullableString(numeroCajero); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+
+            int idBolsaIn = 0, turnoIn = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            {
+                turnoIn = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
+            }
+            if (!string.IsNullOrWhiteSpace(idBolsa)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            {
+                idBolsaIn = Convert.ToInt16(idBolsa); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoCajeroTransaccionesAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+
+            if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
+            {
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "ReporteOperativoCajero.pdf"); //Se devuelve al usuario el PDF requerido
+            }
+
+            return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
+        }
+
+        /// <summary>
+        /// Obtiene el reporte del reporte operativo de turno concentrado en formato PDF
+        /// </summary>
+        /// <remarks>
+        /// <para>turno	1</para>
+        /// <para>fecha	2022-06-21</para>
+        /// </remarks>
+        /// <param name="turno">Ej. 1, 2 o 3</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtiene el reporte operativo de turno filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/concentrado/{turno}/{fecha}")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DownloadReporteOperativoTurnoConcentrado(string? turno, string? fecha)
         {
             turno = GetNullableString(turno); //Se comprueba si lo que se obtuvo no es un espacio en blanco
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
@@ -600,7 +770,61 @@ namespace ApiGateway.Controllers
                 turnoI = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
 
-            var result = await _ferromexService.DownloadReporteOperativoTurnoAsync(turnoI, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteOperativoTurnoConcentradoAsync(turnoI, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+
+            if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
+            {
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", "ReporteTurno.pdf"); //Se devuelve al usuario el PDF requerido
+            }
+
+            return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
+        }
+
+        /// <summary>
+        /// Obtiene el reporte del reporte operativo de turno transacciones en formato PDF
+        /// </summary>
+        /// <remarks>
+        /// <para>turno	1</para>
+        /// <para>fecha	2022-06-21</para>
+        /// </remarks>
+        /// <param name="turno">Ej. 1, 2 o 3</param>
+        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <response code="200">Se obtiene el PDF</response>        
+        /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
+        /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
+        /// <returns>Se obtiene el reporte operativo de las transacciones filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DownloadReporteOperativoTurnoTransacciones(string? turno, string? fecha)
+        {
+            turno = GetNullableString(turno); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
+            int turnoI = 0;
+
+            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            {
+                turnoI = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoTurnoTransaccionesAsync(turnoI, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -617,6 +841,12 @@ namespace ApiGateway.Controllers
         /// <summary>
         /// Obtiene las bolsas correspondientes al cajero y turno indicado
         /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener unas bolsas de ejemplo</para>
+        /// <para>numCajero	500277</para>
+        /// <para>turno	2</para>
+        /// <para>fecha	2014-01-10</para>
+        /// </remarks>
         /// <param name="numeroCajero">Ej. 555555</param>
         /// <param name="turno">Ej. 1, 2 o 3</param>
         /// <param name="fecha">Ej. 2022-06-22</param>
@@ -624,7 +854,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response> 
         /// <returns>Se obtiene las bolsas con sus correspondientes datos, con ayuda de los anteriores filtros indicados anteriormente</returns>
-        [HttpGet("Download/reportecajero/bolsascajero/{numeroCajero}/{turno}/{fecha}")]
+        [HttpGet("reportecajero/bolsascajero/{numeroCajero}/{turno}/{fecha}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

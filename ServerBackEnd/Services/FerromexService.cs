@@ -170,9 +170,9 @@ namespace ApiGateway.Services
                 parameters.Add("semana", semana.ToString());
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCrucesTotales");
         }
-        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana)
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexDescuentoDetalleAsync(string? dia, string? mes, string? semana)
         {
             Dictionary<string, string> parameters = new();
 
@@ -189,7 +189,26 @@ namespace ApiGateway.Services
                 parameters.Add("semana", semana.ToString());
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromex");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexDescuentoResumenAsync(string? dia, string? mes, string? semana)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(dia))
+            {
+                parameters.Add("dia", dia.ToString());
+            }
+            if (!string.IsNullOrEmpty(mes))
+            {
+                parameters.Add("mes", mes);
+            }
+            if (!string.IsNullOrEmpty(semana))
+            {
+                parameters.Add("semana", semana.ToString());
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
         }
         public async Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana)
         {
@@ -208,7 +227,7 @@ namespace ApiGateway.Services
                 parameters.Add("semana", semana.ToString());
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
         }
         public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha)
         {
@@ -229,7 +248,31 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/MantenimientoTags");
         }
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroConcentradoAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (IdBolsa != null)
+            {
+                parameters.Add("IdBolsa", Convert.ToString(IdBolsa));
+            }
+            if (!string.IsNullOrEmpty(numeroBolsa))
+            {
+                parameters.Add("numeroBolsa", numeroBolsa);
+            }
+            if (turno != null)
+            {
+                parameters.Add("turno", Convert.ToString(turno));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroTransaccionesAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha)
         {
             Dictionary<string, string> parameters = new();
 
@@ -253,7 +296,7 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCajero");
         }
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha)
         {
             Dictionary<string, string> parameters = new();
 
@@ -267,7 +310,23 @@ namespace ApiGateway.Services
             }
 
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesDetalle");
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoTransaccionesAsync(int? turno, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (turno != null)
+            {
+                parameters.Add("turno", Convert.ToString(turno));
+            }
+            if (fecha != null)
+            {
+                parameters.Add("fecha", Convert.ToString(fecha));
+            }
+
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
         }
         public async Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha)
         {
