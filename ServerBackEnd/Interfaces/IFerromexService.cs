@@ -10,11 +10,13 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<List<Module>>> GetModulesAsync(string? role = null);
         Task<ApiResponse<Module>> PostModuleAsync(Module module);
         Task<ApiResponse<RoleModules>> PostRoleModulesAsync(RoleModules roleModules);
+
         Task<ApiResponse<List<TagList>>> GetTagsAsync(int? paginaActual, int? numeroDeFilas, string? tag, bool? estatus, DateTime? fecha);
         Task<ApiResponse<int>> GetTagsCountAsync(string? tag, bool? estatus, DateTime? fecha);
         Task<ApiResponse> UpdateTagAsync(TagList tag);
         Task<ApiResponse<TagList>> CreateTagAsync(TagList tag);
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
+
         Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana);
@@ -22,17 +24,10 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha);
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha);
         Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
+
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
         Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha);
         Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha);
 
-        ///EPs GD
-
-        //Task<ApiResponse<bool>> GetMantenimientoTags(string paginaActual, string numeroDeFilas, string tag, string estatus, string fecha);
-        //Task<ApiResponse<bool>> CreatePdfCruces(RoleModules roleModules);
-        //Task<ApiResponse<bool>> CreatePdfCrucesFerromex(RoleModules roleModules);
-        //Task<ApiResponse<bool>> CreatePdfConcentradosFerromex(RoleModules roleModules);
-        //Task<ApiResponse<bool>> CreatePdfMantenimientoTags(RoleModules roleModules);
-        //Task<ApiResponse<bool>> CreatePdfReporteCajero(RoleModules roleModules);
     }
 }
