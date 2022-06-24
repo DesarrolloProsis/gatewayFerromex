@@ -18,11 +18,14 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<bool>> DeleteTagAsync(string? tag);
 
         Task<ApiResponse<byte[]>> DownloadReporteCrucesTotalesAsync(string? dia, string? mes, string? semana);
-        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexDescuentoDetalleAsync(string? dia, string? mes, string? semana);
+        Task<ApiResponse<byte[]>> DownloadReporteCrucesFerromexDescuentoResumenAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana);
         Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoAsync(int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroConcentradoAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroTransaccionesAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoTransaccionesAsync(int? turno, string? fecha);
         Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
 
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
