@@ -227,7 +227,7 @@ namespace ApiGateway.Services
                 parameters.Add("semana", semana.ToString());
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
         }
         public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha)
         {
@@ -248,7 +248,7 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/MantenimientoTags");
         }
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroConcentradoAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroConcentradoAsync(int? IdBolsa)
         {
             Dictionary<string, string> parameters = new();
 
@@ -256,23 +256,10 @@ namespace ApiGateway.Services
             {
                 parameters.Add("IdBolsa", Convert.ToString(IdBolsa));
             }
-            if (!string.IsNullOrEmpty(numeroBolsa))
-            {
-                parameters.Add("numeroBolsa", numeroBolsa);
-            }
-            if (turno != null)
-            {
-                parameters.Add("turno", Convert.ToString(turno));
-            }
-            if (fecha != null)
-            {
-                parameters.Add("fecha", Convert.ToString(fecha));
-            }
 
-
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ConcentradoCajero");
         }
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroTransaccionesAsync(int? IdBolsa, string? numeroBolsa, int? turno, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroTransaccionesAsync(int? IdBolsa)
         {
             Dictionary<string, string> parameters = new();
 
@@ -280,19 +267,6 @@ namespace ApiGateway.Services
             {
                 parameters.Add("IdBolsa", Convert.ToString(IdBolsa));
             }
-            if (!string.IsNullOrEmpty(numeroBolsa))
-            {
-                parameters.Add("numeroBolsa", numeroBolsa);
-            }
-            if (turno != null)
-            {
-                parameters.Add("turno", Convert.ToString(turno));
-            }
-            if (fecha != null)
-            {
-                parameters.Add("fecha", Convert.ToString(fecha));
-            }
-
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCajero");
         }
@@ -310,7 +284,7 @@ namespace ApiGateway.Services
             }
 
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ConcentradoTurno");
         }
         public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoTransaccionesAsync(int? turno, string? fecha)
         {
