@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 namespace ApiGateway.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [AllowAnonymous]
     [ApiController]
     public class FerromexController : ControllerBase
