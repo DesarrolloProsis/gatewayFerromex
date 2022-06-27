@@ -608,51 +608,27 @@ namespace ApiGateway.Controllers
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
         /// <para>IdBolsa	7</para>
-        /// <para>numeroCajero	12312</para>
-        /// <para>turno	2</para>
-        /// <para>fecha	2022-05-05</para>
         /// </remarks>
-        /// <param name="idBolsa">Ej. 1</param>
-        /// <param name="numeroCajero">Ej. 555555</param>
-        /// <param name="turno">Ej. 1, 2 o 3</param>
-        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <param name="idBolsa">Ej. 7</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtiene un concentrado del cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/concentrado/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/concentrado/{idBolsa}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoCajeroConcentrado(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoCajeroConcentrado(string? idBolsa)
         {
-            fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            int idBolsaIn = 0;
 
-            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
-
-            if (fecha != null)
-            {
-                if (Regex.IsMatch(fecha, patternDia) == false)
-                {
-                    return BadRequest("La fecha se encuentra en un formato incorrecto");
-                }
-            }
-
-            numeroCajero = GetNullableString(numeroCajero); //Se comprueba si lo que se obtuvo no es un espacio en blanco
-
-            int idBolsaIn = 0, turnoIn = 0;
-
-            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
-            {
-                turnoIn = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
-            }
             if (!string.IsNullOrWhiteSpace(idBolsa)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
             {
                 idBolsaIn = Convert.ToInt16(idBolsa); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
 
-            var result = await _ferromexService.DownloadReporteOperativoCajeroConcentradoAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteOperativoCajeroConcentradoAsync(idBolsaIn); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -672,51 +648,27 @@ namespace ApiGateway.Controllers
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
         /// <para>IdBolsa	7</para>
-        /// <para>numeroCajero	12312</para>
-        /// <para>turno	2</para>
-        /// <para>fecha	2022-05-05</para>
         /// </remarks>
-        /// <param name="idBolsa">Ej. 1</param>
-        /// <param name="numeroCajero">Ej. 555555</param>
-        /// <param name="turno">Ej. 1, 2 o 3</param>
-        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <param name="idBolsa">Ej. 7</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtienen los cruces totales que hizo ese cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/transacciones/{idBolsa}/{numeroCajero}/{turno}/{fecha}")]
+        [HttpGet("Download/pdf/reporteOperativo/reporteCajero/transacciones/{idBolsa}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoCajeroTransacciones(string? idBolsa, string? numeroCajero, string? turno, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoCajeroTransacciones(string? idBolsa)
         {
-            fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            int idBolsaIn = 0;
 
-            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
-
-            if (fecha != null)
-            {
-                if (Regex.IsMatch(fecha, patternDia) == false)
-                {
-                    return BadRequest("La fecha se encuentra en un formato incorrecto");
-                }
-            }
-
-            numeroCajero = GetNullableString(numeroCajero); //Se comprueba si lo que se obtuvo no es un espacio en blanco
-
-            int idBolsaIn = 0, turnoIn = 0;
-
-            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
-            {
-                turnoIn = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
-            }
             if (!string.IsNullOrWhiteSpace(idBolsa)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
             {
                 idBolsaIn = Convert.ToInt16(idBolsa); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
             }
 
-            var result = await _ferromexService.DownloadReporteOperativoCajeroTransaccionesAsync(idBolsaIn, numeroCajero, turnoIn, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            var result = await _ferromexService.DownloadReporteOperativoCajeroTransaccionesAsync(idBolsaIn); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
