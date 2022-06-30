@@ -227,7 +227,7 @@ namespace ApiGateway.Services
                 parameters.Add("semana", semana.ToString());
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
         }
         public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha)
         {

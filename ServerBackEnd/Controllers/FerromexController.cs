@@ -322,7 +322,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "CrucesTotales.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Transacciones Ferromex Detalle.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -393,7 +393,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "CrucesFerromex.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Descuentos Detalle Amarre.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent();  //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -464,7 +464,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "CrucesFerromex.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Descuentos Detalle Resumen.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent();  //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -535,7 +535,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "ConcentradosFerromex.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Resumen Ingresos Ferromex.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -596,7 +596,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "MantenimientoTags.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Reporte Mantenimiento Tags.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -636,7 +636,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "ReporteOperativoCajero.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Concentrado Cajero.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -676,7 +676,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "ReporteOperativoCajero.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Transacciones Cajero.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -730,7 +730,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "ReporteTurno.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "Concentrado Turno.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
@@ -784,7 +784,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return File(result.Content, "application/pdf", "ReporteTurno.pdf"); //Se devuelve al usuario el PDF requerido
+                return File(result.Content, "application/pdf", "TransaccionesTurno.pdf"); //Se devuelve al usuario el PDF requerido
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
