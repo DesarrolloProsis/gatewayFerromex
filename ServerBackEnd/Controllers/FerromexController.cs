@@ -13,7 +13,6 @@ namespace ApiGateway.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    [AllowAnonymous]
     [ApiController]
     public class FerromexController : ControllerBase
     {
