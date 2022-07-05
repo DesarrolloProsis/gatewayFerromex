@@ -335,12 +335,12 @@ namespace ApiGateway.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    loginCommand.UserName = User.Identity.Name;
-                    //loginCommand.RefreshToken = Request.Cookies["refreshToken"];
-                    loginCommand.RefreshToken = loginCommand.RefreshToken;
-                }
+                //if (User.Identity != null && User.Identity.IsAuthenticated)
+                //{
+                //    loginCommand.UserName = User.Identity.Name;
+                //    //loginCommand.RefreshToken = Request.Cookies["refreshToken"];
+                //    loginCommand.RefreshToken = loginCommand.RefreshToken;
+                //}
                 var result = await _mediator.Send(loginCommand);
                 if (!result.Succeeded)
                 {
