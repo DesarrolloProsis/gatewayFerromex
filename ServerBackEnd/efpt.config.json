@@ -7,11 +7,11 @@
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": "Data",
-   "OutputPath": "",
+   "OutputPath": "Models",
    "ProjectRootNamespace": "ApiGateway",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 0,
-   "SelectedToBeGenerated": 1,
+   "SelectedToBeGenerated": 0,
    "Tables": [
       {
          "Name": "[dbo].[AspNetRoles]",
@@ -20,9 +20,17 @@
       {
          "Name": "[dbo].[AspNetUsers]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[LogRoles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[LogUserActivity]",
+         "ObjectType": 0
       }
    ],
-   "UiHint": "DESKTOP-BE6Q780.BackOfficeFerromex",
+   "UiHint": "PLAZA004.BackOfficeFerromex",
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDbContextSplitting": false,
