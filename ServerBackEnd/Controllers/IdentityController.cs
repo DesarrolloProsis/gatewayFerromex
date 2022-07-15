@@ -23,13 +23,13 @@ namespace ApiGateway.Controllers
     {
         private readonly IMediator _mediator;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IUsuariosService _usuariosService;
+        private readonly IUsuariosService _usuariosService;        
 
         public IdentityController(IMediator mediator, SignInManager<ApplicationUser> signInManager, IUsuariosService usuariosService)
         {
             _mediator = mediator;
             _signInManager = signInManager;
-            _usuariosService = usuariosService;
+            _usuariosService = usuariosService;            
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace ApiGateway.Controllers
         public async Task<IActionResult> UpdateUsuario(Usuario usuario)
         {
             try
-            {
+            {                
                 var res = await _usuariosService.UpdateUsuarioAsync(usuario);
                 if (res)
                     return Ok(new Respuesta() { Estatus = 200, EstatusText = "OK" });
