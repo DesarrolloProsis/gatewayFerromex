@@ -4,6 +4,7 @@ using ApiGateway.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using System.Security.Claims;
 
 namespace ApiGateway.Services
 {
@@ -12,12 +13,14 @@ namespace ApiGateway.Services
         private readonly BackOfficeFerromexContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsuariosService(BackOfficeFerromexContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsuariosService(BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _httpContextAccessor =  httpContextAccessor;
         }
 
         public async Task<int> CountRolesAsync(string nombreRol, bool? estatus)
@@ -151,6 +154,20 @@ namespace ApiGateway.Services
             entity.LastName = usuario.Apellidos;
             entity.Active = usuario.Estatus;
 
+            var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+            LogUserActivity logUser = new LogUserActivity()
+            {
+                IdModifiedUser = idHttpContext,
+                UpdatedDate = DateTime.Now,
+                IdUpdatedUser = entity.Id,
+                TypeAction = "UPDATE",
+                OldName = entity.Name,
+                NewName = usuario.Nombre,
+                OldLastName = entity.LastName,
+                NewLastName = usuario.Apellidos,
+                Active = usuario.Estatus,
+            };
+
             if (!string.IsNullOrWhiteSpace(usuario.Rol) && await _roleManager.RoleExistsAsync(usuario.Rol))
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(entity.Id);
@@ -163,6 +180,7 @@ namespace ApiGateway.Services
 
             try
             {
+                await _dbContext.LogUserActivities.AddAsync(logUser);
                 await _dbContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -175,9 +193,27 @@ namespace ApiGateway.Services
         public async Task<bool> UpdateUsuarioPasswordAsync(UsuarioUpdatePassword usuario)
         {
             ApplicationUser user = await _userManager.FindByIdAsync(usuario.UsuarioId);
+            var entity = await _dbContext.AspNetUsers.FirstOrDefaultAsync(e => e.Id == usuario.UsuarioId);
+
             if (user == null) return false;
+
             await _userManager.RemovePasswordAsync(user);
             await _userManager.AddPasswordAsync(user, usuario.Password);
+
+            var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+            LogUserActivity logUser = new LogUserActivity()
+            {
+                IdModifiedUser = idHttpContext,
+                UpdatedDate = DateTime.Now,
+                IdUpdatedUser = user.Id,
+                TypeAction = "UPDATE PASSWORD",      
+                OldPass = user.PasswordHash,
+                NewePass = usuario.Password,                
+            };
+
+            await _dbContext.LogUserActivities.AddAsync(logUser);
+            await _dbContext.SaveChangesAsync();
+
             return true;
         }
     }
