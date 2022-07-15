@@ -148,12 +148,6 @@ namespace ApiGateway.Services
             var entity = await _dbContext.AspNetUsers.FirstOrDefaultAsync(e => e.Id == usuario.UsuarioId);
             if (entity == null) return false;
 
-            entity.UserName = usuario.NombreUsuario.Trim();
-            entity.NormalizedUserName = usuario.NombreUsuario.Trim().ToUpper();
-            entity.Name = usuario.Nombre;
-            entity.LastName = usuario.Apellidos;
-            entity.Active = usuario.Estatus;
-
             var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
             LogUserActivity logUser = new LogUserActivity()
             {
@@ -167,6 +161,12 @@ namespace ApiGateway.Services
                 NewLastName = usuario.Apellidos,
                 Active = usuario.Estatus,
             };
+
+            entity.UserName = usuario.NombreUsuario.Trim();
+            entity.NormalizedUserName = usuario.NombreUsuario.Trim().ToUpper();
+            entity.Name = usuario.Nombre;
+            entity.LastName = usuario.Apellidos;
+            entity.Active = usuario.Estatus;     
 
             if (!string.IsNullOrWhiteSpace(usuario.Rol) && await _roleManager.RoleExistsAsync(usuario.Rol))
             {
