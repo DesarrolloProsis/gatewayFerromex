@@ -4,6 +4,7 @@ using ApiGateway.Services;
 using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
@@ -19,6 +20,7 @@ namespace ApiGateway.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class IdentityController : Controller
     {
         private readonly IMediator _mediator;
@@ -326,6 +328,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
         [HttpPost("login")]
+        [AllowAnonymous]
         [Consumes("application/json")]
         [Produces("application/json", "application/problem+json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdentityUser))]
