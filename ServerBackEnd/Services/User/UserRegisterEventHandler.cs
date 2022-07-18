@@ -1,4 +1,5 @@
 ﻿using ApiGateway.Data;
+using ApiGateway.Interfaces;
 using ApiGateway.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -13,13 +14,15 @@ namespace ApiGateway.Services
         private readonly BackOfficeFerromexContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogUserActivity _logUserInsertion;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserRegisterEventHandler(BackOfficeFerromexContext dbContext, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> roleManager)
+        public UserRegisterEventHandler(BackOfficeFerromexContext dbContext, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _dbContext = dbContext;
+            _logUserInsertion = logUserActivity;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -41,25 +44,9 @@ namespace ApiGateway.Services
             if (res.Succeeded)
             {
                 var user = await _userManager.FindByNameAsync(entry.UserName);
-                res = await _userManager.AddToRoleAsync(user, createCommand.RoleName);
-
-                var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+                res = await _userManager.AddToRoleAsync(user, createCommand.RoleName);                               
                 var idRole = await _roleManager.FindByNameAsync(createCommand.RoleName);
-
-                var logUser = new LogUserActivity()
-                {
-                    IdModifiedUser = idHttpContext,
-                    UpdatedDate = DateTime.Now,
-                    IdUpdatedUser = user.Id,
-                    TypeAction = "CREATE NEW USER",
-                    AspNetRolesIdNew = idRole.Id,
-                    NewName = user.Name,
-                    NewLastName = user.LastName,
-                    NewePass = createCommand.Password,
-                    Active = true
-                };
-
-                await _dbContext.LogUserActivities.AddAsync(logUser);
+                //_logUserInsertion.InsertarLogCreateUser(entry, createCommand, idRole.Id);
                 await _dbContext.SaveChangesAsync();
             }
             return res;

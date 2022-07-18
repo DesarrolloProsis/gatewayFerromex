@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace ApiGateway.Services
 {
@@ -13,13 +14,15 @@ namespace ApiGateway.Services
         private readonly BackOfficeFerromexContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogUserActivity _logUserInsertion;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsuariosService(BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsuariosService(BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _logUserInsertion = logUserActivity;
             _httpContextAccessor =  httpContextAccessor;
         }
 
@@ -148,19 +151,7 @@ namespace ApiGateway.Services
             var entity = await _dbContext.AspNetUsers.FirstOrDefaultAsync(e => e.Id == usuario.UsuarioId);
             if (entity == null) return false;
 
-            var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
-            LogUserActivity logUser = new LogUserActivity()
-            {
-                IdModifiedUser = idHttpContext,
-                UpdatedDate = DateTime.Now,
-                IdUpdatedUser = entity.Id,
-                TypeAction = "UPDATE",
-                OldName = entity.Name,
-                NewName = usuario.Nombre,
-                OldLastName = entity.LastName,
-                NewLastName = usuario.Apellidos,
-                Active = usuario.Estatus,
-            };
+            _logUserInsertion.InsertarLogEditUser(usuario, entity);
 
             entity.UserName = usuario.NombreUsuario.Trim();
             entity.NormalizedUserName = usuario.NombreUsuario.Trim().ToUpper();
@@ -179,8 +170,7 @@ namespace ApiGateway.Services
             _dbContext.Entry(entity).State = EntityState.Modified;
 
             try
-            {
-                await _dbContext.LogUserActivities.AddAsync(logUser);
+            {                
                 await _dbContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -199,22 +189,97 @@ namespace ApiGateway.Services
 
             await _userManager.RemovePasswordAsync(user);
             await _userManager.AddPasswordAsync(user, usuario.Password);
-
-            var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
-            LogUserActivity logUser = new LogUserActivity()
-            {
-                IdModifiedUser = idHttpContext,
-                UpdatedDate = DateTime.Now,
-                IdUpdatedUser = user.Id,
-                TypeAction = "UPDATE PASSWORD",      
-                OldPass = user.PasswordHash,
-                NewePass = usuario.Password,                
-            };
-
-            await _dbContext.LogUserActivities.AddAsync(logUser);
+            _logUserInsertion.InsertarLogUpdatePass(user, usuario, entity);
             await _dbContext.SaveChangesAsync();
 
             return true;
         }
+    }
+
+    public class LogUserInsertion : ILogUserActivity
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<LogUserInsertion> _logger;
+        private readonly BackOfficeFerromexContext _dbContext;
+
+        public LogUserInsertion(IHttpContextAccessor httpContextAccessor, BackOfficeFerromexContext dbContext, ILogger<LogUserInsertion> logger)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
+            _dbContext = dbContext;
+        }
+
+        public void InsertarLogEditUser(Usuario usuario, AspNetUser aspNetUser)
+        {
+            try
+            {
+                var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+                LogUserActivity logUser = new LogUserActivity()
+                {
+                    IdModifiedUser = idHttpContext,
+                    UpdatedDate = DateTime.Now,
+                    IdUpdatedUser = aspNetUser.Id,
+                    TypeAction = "UPDATE",
+                    OldName = aspNetUser.Name,
+                    NewName = usuario.Nombre,
+                    OldLastName = aspNetUser.LastName,
+                    NewLastName = usuario.Apellidos,
+                    Active = usuario.Estatus,
+                };
+                _dbContext.LogUserActivities.Add(logUser);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+        }
+        public void InsertarLogUpdatePass(ApplicationUser usuario, UsuarioUpdatePassword usuarioPass, AspNetUser aspNetUser)
+        {
+            try
+            {
+                var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+                LogUserActivity logUser = new LogUserActivity()
+                {
+                    IdModifiedUser = idHttpContext,
+                    UpdatedDate = DateTime.Now,
+                    IdUpdatedUser = usuario.Id,
+                    TypeAction = "UPDATE PASSWORD",
+                    OldPass = usuario.PasswordHash,
+                    NewePass = usuarioPass.Password,
+                };
+                _dbContext.LogUserActivities.Add(logUser);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+        }
+
+        public void InsertarLogCreateUser(ApplicationUser usuario, UserCreateCommand usuarioPass, string? idRole)
+        {
+            try
+            {
+                var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var logUser = new LogUserActivity()
+                {
+                    IdModifiedUser = idHttpContext,
+                    UpdatedDate = DateTime.Now,
+                    IdUpdatedUser = usuario.Id,
+                    TypeAction = "CREATE NEW USER",
+                    AspNetRolesIdNew = idRole,
+                    NewName = usuario.Name,
+                    NewLastName = usuario.LastName,
+                    NewePass = usuarioPass.Password,
+                    Active = true
+                };
+                _dbContext.LogUserActivities.Add(logUser);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+        }
+
     }
 }

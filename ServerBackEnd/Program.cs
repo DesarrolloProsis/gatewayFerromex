@@ -15,6 +15,7 @@ using Quartz;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using static ApiGateway.Services.UsuariosService;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -226,6 +227,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
 
 //builder.Services.AddHostedService<Worker>();
+builder.Services.AddScoped<ILogUserActivity, LogUserInsertion>();
 builder.Services.AddScoped<IFerromexService, FerromexService>();
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
 
