@@ -16,9 +16,11 @@ namespace ApiGateway.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogUserActivity _logUserInsertion;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogRolInsertion _logRolInsertion;
 
-        public UsuariosService(BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsuariosService(ILogRolInsertion _logRolInsertion, BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            _logRolInsertion = _logRolInsertion;
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
@@ -138,6 +140,7 @@ namespace ApiGateway.Services
             try
             {
                 await _dbContext.SaveChangesAsync();
+                _logRolInsertion.InsertLogEditRole(rol);
             }
             catch (DbUpdateConcurrencyException)
             {

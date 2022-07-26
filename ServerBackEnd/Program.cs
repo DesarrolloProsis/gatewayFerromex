@@ -230,6 +230,7 @@ builder.Services.AddMediatR(Assembly.Load("ApiGateway"));
 builder.Services.AddScoped<ILogUserActivity, LogUserInsertion>();
 builder.Services.AddScoped<IFerromexService, FerromexService>();
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
+builder.Services.AddScoped<ILogRolInsertion, LogRolInsertion>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
