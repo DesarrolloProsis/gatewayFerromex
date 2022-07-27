@@ -18,9 +18,9 @@ namespace ApiGateway.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogRolInsertion _logRolInsertion;
 
-        public UsuariosService(ILogRolInsertion _logRolInsertion, BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsuariosService(ILogRolInsertion logRolInsertion, BackOfficeFerromexContext dbContext, IHttpContextAccessor httpContextAccessor, ILogUserActivity logUserActivity, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _logRolInsertion = _logRolInsertion;
+            _logRolInsertion = logRolInsertion;
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
@@ -128,6 +128,8 @@ namespace ApiGateway.Services
 
         public async Task<bool> UpdateRoleAsync(Rol rol)
         {
+            IdentityRole roleOld = await _roleManager.FindByIdAsync(rol.IdRol);
+
             var entity = await _dbContext.AspNetRoles.FirstOrDefaultAsync(e => e.Id == rol.IdRol);
             if(entity == null) return false;
 
@@ -135,12 +137,12 @@ namespace ApiGateway.Services
             entity.NormalizedName = rol.NombreRol.Trim().ToUpper();
             entity.Active = rol.Estatus;
 
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            _dbContext.Entry(entity).State = EntityState.Modified;            
 
             try
             {
                 await _dbContext.SaveChangesAsync();
-                _logRolInsertion.InsertLogEditRole(rol);
+                await _logRolInsertion.InsertLogEditRole(rol, roleOld);
             }
             catch (DbUpdateConcurrencyException)
             {

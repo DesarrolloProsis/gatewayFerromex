@@ -1,12 +1,13 @@
 ﻿using ApiGateway.Services;
+using Microsoft.AspNetCore.Identity;
 using Shared;
 
 namespace ApiGateway.Interfaces
 {
     public interface ILogRolInsertion
     {
-        void InsertLogAddOrRemoveRole(UserAddRolesCommand addRolesCommand);
-        void InsertLogAddRole(AddRolesCommand addRolesCommand);
-        void InsertLogEditRole(Rol rol);
+        Task InsertLogAddOrRemoveRole(UserAddRolesCommand addRolesCommand);
+        Task InsertLogAddRole(AddRolesCommand addRolesCommand);
+        Task InsertLogEditRole(Rol rol, IdentityRole rolOld);
     }
 }
