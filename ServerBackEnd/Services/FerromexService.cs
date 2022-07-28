@@ -102,6 +102,15 @@ namespace ApiGateway.Services
             return await GetAsync<List<LaneCatalog>>(path: "lanes");
         }
 
+        public async Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date)
+        {
+            Dictionary<string, string> parameters = new()
+            {
+                { "fecha", date.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'") }
+            };
+            return await GetAsync<int?[]>(path: "turnos", parameters: parameters);
+        }
+
         public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha)
         {
             Dictionary<string, string> parameters = new();

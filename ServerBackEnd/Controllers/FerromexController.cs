@@ -945,6 +945,45 @@ namespace ApiGateway.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Obtiene una lista de turnos
+        /// </summary>                           
+        /// <response code="200">Lista de turnos.</response>        
+        /// <response code="400">Sin turnos para mostrar.</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
+        [HttpGet("turnos/{fecha}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<string,string>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetTurnos(string? fecha)
+        {
+            fecha = GetNullableString(fecha);
+
+            DateTime fechaDt = DateTime.MinValue;
+            if (!string.IsNullOrWhiteSpace(fecha))
+            {
+                if (!DateTime.TryParse(fecha, null, DateTimeStyles.RoundtripKind, out DateTime dt))
+                    return BadRequest($"La fecha '{fecha}' se encuentra en un formato incorrecto");
+                fechaDt = dt;
+            }
+
+            var res = await _ferromexService.GetTurnosAsync(fechaDt);
+            if (res != null)
+            {
+                List<Turnos> turnos = new();
+                foreach (var turno in res.Content)
+                {
+                    if(turno.HasValue)
+                    turnos.Add(new(turno.ToString()));
+                }
+                if(turnos.Count > 0) return Ok(turnos);
+                return NotFound();
+            }
+            return BadRequest();
+        }
+
+        public record Turnos(string? Value);
         #endregion
         static string? GetNullableString(string? value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
     }

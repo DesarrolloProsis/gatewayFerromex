@@ -31,6 +31,6 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
         Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha);
         Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha);
-
+        Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date);
     }
 }

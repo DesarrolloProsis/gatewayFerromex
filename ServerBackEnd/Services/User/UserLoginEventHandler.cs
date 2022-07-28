@@ -44,7 +44,7 @@ namespace ApiGateway.Services
             ApplicationUser? user = null;
             if (loginCommand.UserName != null) user = await _userManager.FindByEmailAsync(loginCommand.UserName);
             if (loginCommand.UserName != null && user == null) user = await _userManager.FindByNameAsync(loginCommand.UserName);
-            if (user == null)
+            if (user == null || (!user.Active ?? false))
             {
                 result.Error = "invalid_request";
                 result.ErrorDescription = "usuario o password invalido";
