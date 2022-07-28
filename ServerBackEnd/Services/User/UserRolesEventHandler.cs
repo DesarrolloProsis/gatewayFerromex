@@ -58,7 +58,8 @@ namespace ApiGateway.Services
                 res = await _userManager.AddToRolesAsync(user, addRolesCommand.Roles);
             }
 
-            _logRolInsertion.InsertLogAddOrRemoveRole(addRolesCommand);
+            await _logRolInsertion.InsertLogAddOrRemoveRole(addRolesCommand);
+
 
             return res;
         }
@@ -160,7 +161,7 @@ namespace ApiGateway.Services
                 }
             }
 
-            _logRolInsertion.InsertLogAddRole(removeRolesCommand);
+            await _logRolInsertion.InsertLogAddRole(removeRolesCommand);
 
             return res;
         }
@@ -216,7 +217,7 @@ namespace ApiGateway.Services
             _roleManager = roleManager; 
         }
 
-        public async void InsertLogAddOrRemoveRole(UserAddRolesCommand addRolesCommand)
+        public async Task InsertLogAddOrRemoveRole(UserAddRolesCommand addRolesCommand)
         {
             try
             {
@@ -233,20 +234,20 @@ namespace ApiGateway.Services
                     UpdatedDate = DateTime.Now,
                     IdUpdatedUser = addRolesCommand.UserId,
                     TypeAction = "AÑADIR O ELIMINAR ROL",
-                    AspNetRolesIdOld = roleIdOld.Id,
-                    AspNetRolesIdNew = roleIdNew.Id
+                    AspNetRolesIdOld = Convert.ToString(roleIdOld.Id),
+                    AspNetRolesIdNew = Convert.ToString(roleIdNew.Id)
                 };
 
                 await _dbContext.LogUserActivities.AddAsync(logRole);
                 await _dbContext.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 
             }
         }
 
-        public async void InsertLogAddRole(AddRolesCommand addRolesCommand)
+        public async Task InsertLogAddRole(AddRolesCommand addRolesCommand)
         {
             try
             {
@@ -273,21 +274,19 @@ namespace ApiGateway.Services
             }
         }
 
-        public async void InsertLogEditRole(Rol rol)
+        public async Task InsertLogEditRole(Rol rol, IdentityRole rolOld)
         {
             try
             {
-                var idHttpContext = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "Usuario no logueado";
-
-                var roleIdOld = await _roleManager.FindByIdAsync(rol.IdRol);
+                var idHttpContext = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "Usuario no logueado";                
 
                 LogRole logRole = new LogRole()
                 {
                     UpdatedDate = DateTime.Now,
                     IdUser = idHttpContext,
-                    AspNetRolesId = roleIdOld.Id,
+                    AspNetRolesId = rolOld.Id,
                     TypeAction = "ACTUALIZAR ROL",
-                    OldNameRol = roleIdOld.Name,
+                    OldNameRol = rolOld.Name,
                     NewNameRol = rol.NombreRol,
                     Active = rol.Estatus
                 };
