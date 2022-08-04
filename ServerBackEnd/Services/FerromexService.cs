@@ -120,6 +120,11 @@ namespace ApiGateway.Services
             return await GetAsync<List<LaneCatalog>>(path: "lanes");
         }
 
+        public async Task<ApiResponse<List<TypeClass>>> GetClassAsync()
+        {
+            return await GetAsync<List<TypeClass>>(path: "class");
+        }
+
         public async Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date)
         {
             Dictionary<string, string> parameters = new()

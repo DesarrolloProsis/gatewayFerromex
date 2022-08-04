@@ -958,6 +958,30 @@ namespace ApiGateway.Controllers
             return BadRequest();
         }
 
+        //Cambios Richi
+        [HttpGet("clases")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<TypeClass>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetClass()
+        {
+            var res = await _ferromexService.GetClassAsync();
+
+            if (res != null)
+            {
+                List<TypeClass> clases = new();
+
+                foreach (var clase in res.Content)
+                {
+                    clases.Add(new() { IdClass = clase.IdClass, NameClass = clase.NameClass, ClassCode = clase.ClassCode});
+                }
+
+                return Ok(clases);
+            }
+            return BadRequest();
+        }
+
         /// <summary>
         /// Obtiene una lista de turnos
         /// </summary>                           
