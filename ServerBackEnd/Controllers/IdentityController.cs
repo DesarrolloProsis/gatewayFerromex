@@ -78,6 +78,7 @@ namespace ApiGateway.Controllers
         /// <response code="204">Se agregaron correctamento los roles al usuario</response>
         /// <response code="400">Alguno de los datos requeridos es incorrecto</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway</response>
+        [Obsolete]
         [HttpPost("addUserRoles")]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces("application/json", "application/problem+json")]

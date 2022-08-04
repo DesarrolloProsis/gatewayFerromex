@@ -1021,7 +1021,7 @@ namespace ApiGateway.Controllers
         }
 
         public record Turnos(string? Value);
-        public record Clases(string Value);
+        public record Clases(string? Clase);
         #endregion
         static string? GetNullableString(string? value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
     }
