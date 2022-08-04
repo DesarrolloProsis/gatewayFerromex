@@ -961,7 +961,7 @@ namespace ApiGateway.Controllers
         //Cambios Richi
         [HttpGet("clases")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<TypeClass>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Clases>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetClass()
@@ -970,11 +970,11 @@ namespace ApiGateway.Controllers
 
             if (res != null)
             {
-                List<TypeClass> clases = new();
+                List<Clases> clases = new();
 
                 foreach (var clase in res.Content)
                 {
-                    clases.Add(new() { IdClass = clase.IdClass, NameClass = clase.NameClass, ClassCode = clase.ClassCode});
+                    clases.Add(new(clase.ClassCode.ToString()));
                 }
 
                 return Ok(clases);
@@ -1021,6 +1021,7 @@ namespace ApiGateway.Controllers
         }
 
         public record Turnos(string? Value);
+        public record Clases(string Value);
         #endregion
         static string? GetNullableString(string? value) => !string.IsNullOrWhiteSpace(value) && value.ToUpper().Contains("NULL") ? null : value;
     }
