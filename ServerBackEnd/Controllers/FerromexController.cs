@@ -280,7 +280,7 @@ namespace ApiGateway.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DownloadReporteCrucesTotales(string? dia, string? mes, string? semana)
-        {         
+        {
             dia = GetNullableString(dia); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             mes = GetNullableString(mes); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
             semana = GetNullableString(semana); //Se comprueba si lo que se obtuvo no es un espacio en blanco 
@@ -714,7 +714,7 @@ namespace ApiGateway.Controllers
             turno = GetNullableString(turno); //Se comprueba si lo que se obtuvo no es un espacio en blanco
             fecha = GetNullableString(fecha); //Se comprueba si lo que se obtuvo no es un espacio en blanco
 
-             string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
 
             if (fecha != null)
             {
@@ -869,13 +869,14 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
         /// <returns>Regresa paginacion de tags</returns>
-        [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}/{noDePlaca}/{noEconomico}")]
+        [HttpGet("registroInformacion/{paginaActual}/{numeroDeFilas}/{fecha}/{tag}/{carril}/{cuerpo}/{noDePlaca}/{noEconomico}/{clase}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CrucesPaginacion))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetTransactions(string? paginaActual, string? numeroDeFilas, string? tag, string? carril, string? cuerpo, string? fecha, string? noDePlaca, string? noEconomico)
+        public async Task<IActionResult> GetTransactions(string? paginaActual, string? numeroDeFilas, string? tag, string? carril, string? cuerpo, string? fecha, string? noDePlaca, string? noEconomico, string? clase)
         {
+            clase = GetNullableString(clase);
             paginaActual = GetNullableString(paginaActual);
             numeroDeFilas = GetNullableString(numeroDeFilas);
             tag = GetNullableString(tag);
@@ -910,10 +911,10 @@ namespace ApiGateway.Controllers
                 fechaDt = dt;
             }
 
-            var tagsCountResponse = await _ferromexService.GetTransactionsCountAsync(tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico);
+            var tagsCountResponse = await _ferromexService.GetTransactionsCountAsync(tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico, clase);
             var tags = tagsCountResponse.Content < numeroDeFilasInt
-                ? await _ferromexService.GetTransactionsAsync(paginaActualInt, tagsCountResponse.Content, tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico)
-                : await _ferromexService.GetTransactionsAsync(paginaActualInt, numeroDeFilasInt, tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico);
+                ? await _ferromexService.GetTransactionsAsync(paginaActualInt, tagsCountResponse.Content, tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico, clase)
+                : await _ferromexService.GetTransactionsAsync(paginaActualInt, numeroDeFilasInt, tag, carril, cuerpo, fechaDt, noDePlaca, noEconomico, clase);
 
             if (!tagsCountResponse.Succeeded)
             {
@@ -965,7 +966,7 @@ namespace ApiGateway.Controllers
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpGet("turnos/{fecha}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<string,string>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<string, string>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTurnos(string? fecha)
@@ -986,10 +987,10 @@ namespace ApiGateway.Controllers
                 List<Turnos> turnos = new();
                 foreach (var turno in res.Content)
                 {
-                    if(turno.HasValue)
-                    turnos.Add(new(turno.ToString()));
+                    if (turno.HasValue)
+                        turnos.Add(new(turno.ToString()));
                 }
-                if(turnos.Count > 0) return Ok(turnos);
+                if (turnos.Count > 0) return Ok(turnos);
                 return NotFound();
             }
             return BadRequest();

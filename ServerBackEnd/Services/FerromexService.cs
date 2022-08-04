@@ -129,7 +129,7 @@ namespace ApiGateway.Services
             return await GetAsync<int?[]>(path: "turnos", parameters: parameters);
         }
 
-        public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico)
+        public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase)
         {
             Dictionary<string, string> parameters = new();
             if (paginaActual != null && paginaActual != 0)
@@ -164,10 +164,14 @@ namespace ApiGateway.Services
             {
                 parameters.Add("noEconomico", noEconomico);
             }
+            if (!string.IsNullOrEmpty(clase))
+            {
+                parameters.Add("clase", clase);
+            }
 
             return await GetAsync<List<Cruce>>(path: "cruces", parameters: parameters);
         }
-        public async Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico)
+        public async Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase)
         {
             Dictionary<string, string> parameters = new();
             if (!string.IsNullOrEmpty(tag))
@@ -193,6 +197,10 @@ namespace ApiGateway.Services
             if (!string.IsNullOrEmpty(noEconomico))
             {
                 parameters.Add("noEconomico", noEconomico);
+            }
+            if (!string.IsNullOrEmpty(clase))
+            {
+                parameters.Add("clase", clase);
             }
 
             return await GetAsync<int>(path: "transactionsCount", parameters: parameters);
@@ -277,7 +285,7 @@ namespace ApiGateway.Services
                 parameters.Add("noEconomia", noEconomico);
             }
 
-                return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
         }
         public async Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana)
         {
@@ -298,7 +306,8 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteIngresosResumen");
         }
-        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha, string? noDePlaca, string? noEconomico)        {
+        public async Task<ApiResponse<byte[]>> DownloadMantenimientoTagsAsync(string? tag, bool? estatus, DateTime? fecha, string? noDePlaca, string? noEconomico)
+        {
             Dictionary<string, string> parameters = new();
 
             if (!string.IsNullOrEmpty(tag))
