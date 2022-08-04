@@ -110,7 +110,13 @@ namespace ApiGateway.Controllers
 
         /// <summary>
         /// Obtiene una paginacion de tag aplicando filtros
-        /// </summary>        
+        /// </summary>
+        /// <remarks>
+        /// <para>Ejemplo de datos para obtener un json con los datos esperados</para>
+        /// <para>tag  000012021470CPFI01065692</para>
+        /// <para>estatus   ACTIVO</para>
+        /// <para>fecha   2014-04-07</para>
+        /// </remarks>
         /// <param name="paginaActual">Desde donde quiere iniciar la paginacion</param>   
         /// <param name="numeroDeFilas">Numero de registros por pagina</param>   
         /// <param name="tag">Numero de tag</param>   
@@ -263,9 +269,9 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>dia   2022-06-21</para>
-        /// <para>mes   2022-06</para>
-        /// <para>semana    2022-W26</para>
+        /// <para>dia   2014-04-07</para>
+        /// <para>mes   </para>
+        /// <para>semana    </para>
         /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
@@ -334,9 +340,9 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>dia	2022-06-21</para>
-        /// <para>mes   2022-06</para>
-        /// <para>semana    2022-W26</para>
+        /// <para>dia	2014-04-08</para>
+        /// <para>mes   </para>
+        /// <para>semana   </para>
         /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
@@ -408,9 +414,9 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>dia	2022-06-21</para>
-        /// <para>mes   2022-06</para>
-        /// <para>semana    2022-W26</para>
+        /// <para>dia	2014-04-07</para>
+        /// <para>mes   </para>
+        /// <para>semana   </para>
         /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
@@ -482,9 +488,9 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>dia	2022-06-21</para>
-        /// <para>mes   2022-06</para>
-        /// <para>semana    2022-W26</para>
+        /// <para>dia	2014-04-08</para>
+        /// <para>mes   </para>
+        /// <para>semana    </para>
         /// </remarks>
         /// <param name="dia">Ej. 2022-06-21</param>
         /// <param name="mes">Ej. 2022-06</param>
@@ -959,6 +965,13 @@ namespace ApiGateway.Controllers
         }
 
         //Cambios Richi
+        /// <summary>
+        /// Obtiene una lista de todas las clases
+        /// </summary>
+        /// <returns></returns>
+        /// /// <response code="200">Lista de clases</response>        
+        /// <response code="400">Sin clases que mostrar</response>
+        /// <response code="500">Error por excepcion no controlada en el Gateway.</response>        
         [HttpGet("clases")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Clases>))]
