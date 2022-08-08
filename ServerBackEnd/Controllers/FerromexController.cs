@@ -273,9 +273,9 @@ namespace ApiGateway.Controllers
         /// <para>mes   </para>
         /// <para>semana    </para>
         /// </remarks>
-        /// <param name="dia">Ej. 2022-06-21</param>
-        /// <param name="mes">Ej. 2022-06</param>
-        /// <param name="semana">Ej. 2022-W24</param>
+        /// <param name="dia">Ej. 2014-04-07</param>
+        /// <param name="mes">Ej. 2014-04</param>
+        /// <param name="semana">Ej. 2014-W15</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
@@ -344,9 +344,12 @@ namespace ApiGateway.Controllers
         /// <para>mes   </para>
         /// <para>semana   </para>
         /// </remarks>
-        /// <param name="dia">Ej. 2022-06-21</param>
-        /// <param name="mes">Ej. 2022-06</param>
-        /// <param name="semana">Ej. 2022-W24</param>
+        /// <param name="dia">Ej. 2014-04-08</param>
+        /// <param name="mes">Ej. 2014-04</param>
+        /// <param name="semana">Ej. 2014-W15</param>
+        /// <param name="tag">Ej. 000012021471IMDM20998648</param>
+        /// <param name="noDePlaca">Ej. 471IM648</param>
+        /// <param name="noEconomico">Ej. AAA-0338</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
@@ -414,18 +417,21 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>dia	2014-04-07</para>
+        /// <para>dia	2014-04-08</para>
         /// <para>mes   </para>
         /// <para>semana   </para>
         /// </remarks>
-        /// <param name="dia">Ej. 2022-06-21</param>
-        /// <param name="mes">Ej. 2022-06</param>
-        /// <param name="semana">Ej. 2022-W24</param>
+        /// <param name="dia">Ej. 2014-04-08</param>
+        /// <param name="mes">Ej. 2014-04</param>
+        /// <param name="semana">Ej. 2014-W15</param>
+        /// <param name="tag">Ej. 000012021471IMDM20998648</param>
+        /// <param name="noDePlaca">Ej. 471IM648</param>
+        /// <param name="noEconomico">Ej. AAA-0338</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtienen los cruces ferromex con descuento filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
-        [HttpGet("Download/pdf/crucesferromex/{dia}/{mes}/{semana},/{tag}/{noDePlaca}/{noEconomico}")]
+        [HttpGet("Download/pdf/crucesferromex/descuentoamarreresumen/{dia}/{mes}/{semana}/{tag}/{noDePlaca}/{noEconomico}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -492,9 +498,9 @@ namespace ApiGateway.Controllers
         /// <para>mes   </para>
         /// <para>semana    </para>
         /// </remarks>
-        /// <param name="dia">Ej. 2022-06-21</param>
-        /// <param name="mes">Ej. 2022-06</param>
-        /// <param name="semana">Ej. 2022-W24</param>
+        /// <param name="dia">Ej. 2014-04-08</param>
+        /// <param name="mes">Ej. 2014-04</param>
+        /// <param name="semana">Ej. 2014-W15</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
@@ -559,13 +565,15 @@ namespace ApiGateway.Controllers
         /// </summary>
         /// <remarks>
         /// <para>Ejemplo de datos para obtener un PDF de ejemplo</para>
-        /// <para>tag	CPFI01376954</para>
+        /// <para>tag	000012021471IMDM20998648</para>
         /// <para>estatus	ACTIVO</para>
-        /// <para>fecha	2022-06-01</para>
+        /// <para>fecha	2014-04-07</para>
         /// </remarks>
-        /// <param name="tag">Ej.IMDM22961475</param>
+        /// <param name="tag">Ej. 000012021471IMDM20998648</param>
         /// <param name="estatus">Ej. ACTIVO o INACTIVO</param>
-        /// <param name="fecha">Ej. 2022-06-22</param>
+        /// <param name="fecha">Ej. 2014-04-07</param>
+        /// <param name="noDePlaca">Ej. 471IM648</param>
+        /// <param name="noEconomico">Ej. AAA-0338</param>
         /// <response code="200">Se obtiene el PDF</response>        
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
@@ -870,7 +878,10 @@ namespace ApiGateway.Controllers
         /// <param name="tag">Numero de tag</param>   
         /// <param name="carril">Numero de carril</param>   
         /// <param name="cuerpo">Cuerpo del carril</param>   
-        /// <param name="fecha">Filtro fecha para los tags</param>  
+        /// <param name="fecha">Filtro fecha para los tags</param>
+        /// <param name="noDePlaca">Numero de placa</param>
+        /// <param name="noEconomico">Numero economico</param>
+        /// <param name="clase">Codigo de clase</param>  
         /// <response code="200">Se obtiene el objeto para la paginacion de Transacciones.</response>        
         /// <response code="400">Alguno de los parametros no es valido.</response>
         /// <response code="500">Error por excepcion no controlada en el Gateway.</response>  
