@@ -52,7 +52,7 @@ var securityRequirements = new OpenApiSecurityRequirement()
 };
 var openApiInfo = new OpenApiInfo()
 {
-    Version = "1.0",
+    Version = "1.2",
     Title = "API Gateway",
     Description = ""
 };
@@ -250,7 +250,7 @@ else
     app.UseSwaggerUI();
 }
 app.UseProblemDetails();
-app.UseBlazorFrameworkFiles();
+//app.UseBlazorFrameworkFiles();
 
 app.UseCors(x => x
                 .AllowAnyMethod()

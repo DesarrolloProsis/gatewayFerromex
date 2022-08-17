@@ -287,7 +287,7 @@ namespace ApiGateway.Services
             }
             if (!string.IsNullOrEmpty(noEconomico))
             {
-                parameters.Add("noEconomia", noEconomico);
+                parameters.Add("noEconomico", noEconomico);
             }
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
