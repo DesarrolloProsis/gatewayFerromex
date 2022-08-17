@@ -291,7 +291,7 @@ namespace ApiGateway.Services
             }
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ReporteCrucesFerromexResumen");
-        }
+        }     
         public async Task<ApiResponse<byte[]>> DownloadConcentradosFerromexAsync(string? dia, string? mes, string? semana)
         {
             Dictionary<string, string> parameters = new();
@@ -360,6 +360,23 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCajero");
         }
+
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoDeatelleAsync(string? carril, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(carril))
+            {
+                parameters.Add("carril", carril);
+            }
+            if (!string.IsNullOrEmpty(fecha))
+            {
+                parameters.Add("fecha", fecha);
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+
         public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha)
         {
             Dictionary<string, string> parameters = new();
@@ -392,6 +409,23 @@ namespace ApiGateway.Services
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
         }
+
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoConcentradoAsync(string? carril, string? fecha)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(carril))
+            {
+                parameters.Add("carril", carril);
+            }
+            if (!string.IsNullOrEmpty(fecha))
+            {
+                parameters.Add("fecha", fecha);
+            }
+
+            return await GetAsync<byte[]>(parameters: parameters, path: "");
+        }
+
         public async Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha)
         {
             Dictionary<string, string> parameters = new();

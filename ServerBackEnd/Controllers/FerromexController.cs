@@ -637,6 +637,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtiene un concentrado del cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [Obsolete]
         [HttpGet("Download/pdf/reporteOperativo/reporteCajero/concentrado/{idBolsa}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -677,6 +678,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtienen los cruces totales que hizo ese cajero filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [Obsolete]
         [HttpGet("Download/pdf/reporteOperativo/reporteCajero/transacciones/{idBolsa}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -703,6 +705,41 @@ namespace ApiGateway.Controllers
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
+        }
+
+        //Nuevo EP
+        [HttpGet("Download/pdf/reporteOperativo/detalles/{carril}/{fecha}")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DownloadReporteOperativoDeatelle(string? carril, string? fecha)
+        {
+            carril = GetNullableString(carril);
+            fecha = GetNullableString(fecha);
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoDeatelleAsync(carril, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+
+            if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
+            {
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", ".pdf"); //Se devuelve al usuario el PDF requerido
+            }
+
+            return NoContent();
         }
 
         /// <summary>
@@ -811,6 +848,41 @@ namespace ApiGateway.Controllers
             }
 
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
+        }
+
+        //Nuevo EP
+        [HttpGet("Download/pdf/reporteOperativo/concentrado/{carril}/{fecha}")]
+        [Produces("application/pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DownloadReporteOperativoConcentrado(string? carril, string? fecha)
+        {
+            carril = GetNullableString(carril);
+            fecha = GetNullableString(fecha);
+
+            string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
+
+            if (fecha != null)
+            {
+                if (Regex.IsMatch(fecha, patternDia) == false)
+                {
+                    return BadRequest("La fecha se encuentra en un formato incorrecto");
+                }
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoConcentradoAsync(carril, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+
+            if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
+            {
+                return StatusCode(result.Status, result.ErrorMessage); //Se devuelve al usuario el estatus del error del microServicio y el mensaje del error
+            }
+            else
+            {
+                return File(result.Content, "application/pdf", ".pdf"); //Se devuelve al usuario el PDF requerido
+            }
+
+            return NoContent();
         }
 
         /// <summary>
