@@ -755,6 +755,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtiene el reporte operativo de turno filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [Obsolete]
         [HttpGet("Download/pdf/reporteOperativo/reporteTurno/concentrado/{turno}/{fecha}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -809,6 +810,7 @@ namespace ApiGateway.Controllers
         /// <response code="400">Alguno de los parametros no es validoo se encuentra en algun formato incorrecto</response>
         /// <response code="204">Error en el microServicio, no controlada por el gateway</response>  
         /// <returns>Se obtiene el reporte operativo de las transacciones filtrandolos por los parametros pedidos anteriormente en formato PDF</returns>
+        [Obsolete]
         [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]

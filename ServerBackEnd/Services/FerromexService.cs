@@ -374,7 +374,7 @@ namespace ApiGateway.Services
                 parameters.Add("fecha", fecha);
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
         }
 
         public async Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha)
@@ -423,7 +423,7 @@ namespace ApiGateway.Services
                 parameters.Add("fecha", fecha);
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ConcentradoTurno");
         }
 
         public async Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha)
