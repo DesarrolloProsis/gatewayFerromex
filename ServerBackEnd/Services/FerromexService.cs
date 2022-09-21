@@ -4,6 +4,7 @@ using ApiGateway.Proxies;
 using ReportesData.Models;
 using Shared;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ApiGateway.Services
 {
@@ -445,6 +446,18 @@ namespace ApiGateway.Services
 
             return await GetAsync<List<Bolsas>>(parameters: parameters, path: "/GetBolsas");
         }
+
+        public async Task<ApiResponse<List<Viapasstags>>> GetTagsOrTagAsync(string? tag)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(tag))
+            {
+                parameters.Add("tag", tag);
+            }
+            return await GetAsync<List<Viapasstags>>(parameters: parameters, path: "/ViaPassTags");
+        }
     }
 }
+
 

@@ -940,6 +940,23 @@ namespace ApiGateway.Controllers
             return NoContent(); //Si no se entro en ninguna de las anterior opciones, se devuelve un noContent
         }
 
+        [HttpGet("ViaPassTags/{tag}")]
+        public async Task<IActionResult> GetTagsOrTag(string? tag)
+        {
+            tag = GetNullableString(tag);
+
+            var result = await _ferromexService.GetTagsOrTagAsync(tag); 
+
+            if (!result.Succeeded) 
+            {
+                return StatusCode(result.Status, result.ErrorMessage); 
+            }
+            else
+            {
+                return Ok(result); 
+            }
+        }
+
         #endregion
 
         #region Telepeaje

@@ -37,5 +37,7 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase);
         Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase);
         Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date);
+
+        Task<ApiResponse<List<Viapasstags>>> GetTagsOrTagAsync(string? tag);
     }
 }
