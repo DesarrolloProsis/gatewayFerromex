@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var connectionString = "Server=.;Database=BackOfficeIntermodalCapa;User=PROSIS_DEV;Password=Pr0$1$D3v;MultipleActiveResultSets=true";
+var connectionString = "Server=.;Database=BackOfficeIntermodal;User=PROSIS_DEV;Password=Pr0$1$D3v;MultipleActiveResultSets=true";
 var secretKey = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("SecretKey"));
 var reportesBaseAddress = builder.Configuration.GetValue<string>("ReportesBaseAddress");
 var key = new SymmetricSecurityKey(secretKey);
