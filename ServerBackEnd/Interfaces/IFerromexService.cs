@@ -30,6 +30,7 @@ namespace ApiGateway.Interfaces
 
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha);
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoTransaccionesAsync(int? turno, string? fecha);
+        Task<ApiResponse<byte[]>> GetReporteActividadUsuariosAsync(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion);
         Task<ApiResponse<List<Bolsas>>> GeneracionBolsasAsync(string? numeroCajero, int? turno, DateTime? fecha);
 
         Task<ApiResponse<List<LaneCatalog>>> GetLanesAsync();
@@ -39,5 +40,6 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date);
 
         Task<ApiResponse<List<Viapasstags>>> GetTagsOrTagAsync(string? tag);
+        Task<ApiResponse<List<ActividadUsuarios>>> GetActividadUsuariosAsync(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion);
     }
 }

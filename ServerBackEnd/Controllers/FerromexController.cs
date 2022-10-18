@@ -957,6 +957,38 @@ namespace ApiGateway.Controllers
             }
         }
 
+
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
+        public async Task<IActionResult> GetReporteActividadUsuarios(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
+        {
+
+            var result = await _ferromexService.GetReporteActividadUsuariosAsync(dia, semana, mes, nombre, rol, accion);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(result.Status, result.ErrorMessage);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
+
+        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
+        public async Task<IActionResult> GetActividadUsuarios(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
+        {
+
+            var result = await _ferromexService.GetActividadUsuariosAsync(paginaActual, numeroDeFilas, dia, semana, mes, nombre, rol, accion);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(result.Status, result.ErrorMessage);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
         #endregion
 
         #region Telepeaje
