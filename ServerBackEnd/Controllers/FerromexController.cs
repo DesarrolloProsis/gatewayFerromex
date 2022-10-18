@@ -958,7 +958,7 @@ namespace ApiGateway.Controllers
         }
 
 
-        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
+        [HttpGet("Download/pdf/reporteActividadUsuario/{dia}/{semana}/{mes}/{nombre}/{rol}/{accion}")]
         public async Task<IActionResult> GetReporteActividadUsuarios(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
         {
 
@@ -974,7 +974,7 @@ namespace ApiGateway.Controllers
             }
         }
 
-        [HttpGet("Download/pdf/reporteOperativo/reporteTurno/transacciones/{turno}/{fecha}")]
+        [HttpGet("ActividadUsuario/{paginaActual}/{numeroDeFilas}/{dia}/{semana}/{mes}/{nombre}/{rol}/{accion}")]
         public async Task<IActionResult> GetActividadUsuarios(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
         {
 
