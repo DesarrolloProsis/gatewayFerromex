@@ -219,19 +219,36 @@ namespace ApiGateway.Services
             try
             {
                 var idHttpContext = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
-                LogUserActivity logUser = new LogUserActivity()
+                if (usuario.Nombre != null)
                 {
-                    IdModifiedUser = idHttpContext,
-                    UpdatedDate = DateTime.Now,
-                    IdUpdatedUser = aspNetUser.Id,
-                    TypeAction = "UPDATE",
-                    OldName = aspNetUser.Name,
-                    NewName = usuario.Nombre,
-                    OldLastName = aspNetUser.LastName,
-                    NewLastName = usuario.Apellidos,
-                    Active = usuario.Estatus,
-                };
-                _dbContext.LogUserActivities.Add(logUser);
+                    LogUserActivity logUser = new LogUserActivity()
+                    {
+                        IdModifiedUser = idHttpContext,
+                        UpdatedDate = DateTime.Now,
+                        IdUpdatedUser = aspNetUser.Id,
+                        TypeAction = "8",
+                        OldName = aspNetUser.Name,
+                        NewName = usuario.Nombre,
+                        OldLastName = aspNetUser.LastName,
+                        NewLastName = usuario.Apellidos,
+                        Active = usuario.Estatus,
+                    };
+                    _dbContext.LogUserActivities.Add(logUser);
+                }
+                else
+                {
+
+                    LogUserActivity logUser = new LogUserActivity()
+                    {
+                        IdModifiedUser = idHttpContext,
+                        UpdatedDate = DateTime.Now,
+                        IdUpdatedUser = aspNetUser.Id,
+                        TypeAction = "7",
+                        Active = usuario.Estatus,
+
+                    };
+                    _dbContext.LogUserActivities.Add(logUser);
+                }                               
             }
             catch (Exception ex)
             {
@@ -248,7 +265,7 @@ namespace ApiGateway.Services
                     IdModifiedUser = idHttpContext,
                     UpdatedDate = DateTime.Now,
                     IdUpdatedUser = usuario.Id,
-                    TypeAction = "UPDATE PASSWORD",
+                    TypeAction = "9",
                     OldPass = usuario.PasswordHash,
                     NewePass = usuarioPass.Password,
                 };
@@ -271,7 +288,7 @@ namespace ApiGateway.Services
                     IdModifiedUser = idHttpContext,
                     UpdatedDate = DateTime.Now,
                     IdUpdatedUser = usuario.Id,
-                    TypeAction = "CREATE NEW USER",
+                    TypeAction = "6",
                     AspNetRolesIdNew = idRole,
                     NewName = usuario.Name,
                     NewLastName = usuario.LastName,

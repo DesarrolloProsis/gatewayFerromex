@@ -233,13 +233,13 @@ namespace ApiGateway.Services
                     IdModifiedUser = idHttpContext,
                     UpdatedDate = DateTime.Now,
                     IdUpdatedUser = addRolesCommand.UserId,
-                    TypeAction = "AÑADIR O ELIMINAR ROL",
+                    TypeAction = "2",
                     AspNetRolesIdOld = Convert.ToString(roleIdOld.Id),
                     AspNetRolesIdNew = Convert.ToString(roleIdNew.Id)
                 };
 
                 await _dbContext.LogUserActivities.AddAsync(logRole);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(); 
             }
             catch (Exception ex)
             {
@@ -260,7 +260,7 @@ namespace ApiGateway.Services
                     UpdatedDate = DateTime.Now,
                     IdUser = idHttpContext,
                     AspNetRolesId = roleIdNew.Id,
-                    TypeAction = "AÑADIR ROL",
+                    TypeAction = "1",
                     NewNameRol = roleIdNew.Name,
                     Active = true
                 };
@@ -285,7 +285,7 @@ namespace ApiGateway.Services
                     UpdatedDate = DateTime.Now,
                     IdUser = idHttpContext,
                     AspNetRolesId = rolOld.Id,
-                    TypeAction = "ACTUALIZAR ROL",
+                    TypeAction = "5",
                     OldNameRol = rolOld.Name,
                     NewNameRol = rol.NombreRol,
                     Active = rol.Estatus
