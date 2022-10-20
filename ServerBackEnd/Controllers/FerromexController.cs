@@ -970,7 +970,7 @@ namespace ApiGateway.Controllers
             }
             else
             {
-                return Ok(result);
+                return File(result.Content, "application/pdf", ".pdf"); ;
             }
         }
 
@@ -979,6 +979,22 @@ namespace ApiGateway.Controllers
         {
 
             var result = await _ferromexService.GetActividadUsuariosAsync(paginaActual, numeroDeFilas, dia, semana, mes, nombre, rol, accion);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(result.Status, result.ErrorMessage);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
+
+        [HttpGet("ActividadUsuarioCount/{dia}/{semana}/{mes}/{nombre}/{rol}/{accion}")]
+        public async Task<IActionResult> GetActividadUsuariosCount(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
+        {
+
+            var result = await _ferromexService.GetActividadUsuariosCountAsync(dia, semana, mes, nombre, rol, accion);
 
             if (!result.Succeeded)
             {

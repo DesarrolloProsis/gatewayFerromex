@@ -488,7 +488,7 @@ namespace ApiGateway.Services
                 parameters.Add("accion", accion);
             }
 
-            return await GetAsync<byte[]>(parameters: parameters, path: "/ReporteActividadUsuario");
+            return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ActividadUsuario");
         }
 
         public async Task<ApiResponse<List<ActividadUsuarios>>> GetActividadUsuariosAsync(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
@@ -529,6 +529,38 @@ namespace ApiGateway.Services
             }
 
             return await GetAsync<List<ActividadUsuarios>>(parameters: parameters, path: "/ActividadUsuario");
+        }
+
+        public async Task<ApiResponse<int>> GetActividadUsuariosCountAsync(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion)
+        {
+            Dictionary<string, string> parameters = new();
+
+            if (!string.IsNullOrEmpty(dia))
+            {
+                parameters.Add("dia", dia);
+            }
+            if (semana != null)
+            {
+                parameters.Add("semana", Convert.ToString(semana));
+            }
+            if (mes != null)
+            {
+                parameters.Add("mes", Convert.ToString(mes));
+            }
+            if (!string.IsNullOrEmpty(nombre))
+            {
+                parameters.Add("nombre", nombre);
+            }
+            if (!string.IsNullOrEmpty(rol))
+            {
+                parameters.Add("rol", rol);
+            }
+            if (!string.IsNullOrEmpty(accion))
+            {
+                parameters.Add("accion", accion);
+            }
+
+            return await GetAsync<int>(parameters: parameters, path: "/ActividadUsuarioCount");
         }
     }
 }

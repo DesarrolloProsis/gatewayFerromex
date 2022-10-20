@@ -41,5 +41,6 @@ namespace ApiGateway.Interfaces
 
         Task<ApiResponse<List<Viapasstags>>> GetTagsOrTagAsync(string? tag);
         Task<ApiResponse<List<ActividadUsuarios>>> GetActividadUsuariosAsync(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion);
+        Task<ApiResponse<int>> GetActividadUsuariosCountAsync(string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion);
     }
 }
