@@ -708,15 +708,17 @@ namespace ApiGateway.Controllers
         }
 
         //Nuevo EP
-        [HttpGet("Download/pdf/reporteOperativo/detalles/{carril}/{fecha}")]
+        [HttpGet("Download/pdf/reporteOperativo/detalles/{carril}/{fecha}/{cajero}/{turno}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoDeatelle(string? carril, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoDeatelle(string? carril, string? fecha, string? cajero, string? turno)
         {
             carril = GetNullableString(carril);
             fecha = GetNullableString(fecha);
+            cajero = GetNullableString(cajero);
+            turno = GetNullableString(turno);
 
             string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
 
@@ -727,8 +729,21 @@ namespace ApiGateway.Controllers
                     return BadRequest("La fecha se encuentra en un formato incorrecto");
                 }
             }
+            int turnoI = 0;
 
-            var result = await _ferromexService.DownloadReporteOperativoDeatelleAsync(carril, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            {
+                try
+                {
+                    turnoI = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
+                }
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoDeatelleAsync(carril, fecha, cajero, turno); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -853,15 +868,17 @@ namespace ApiGateway.Controllers
         }
 
         //Nuevo EP
-        [HttpGet("Download/pdf/reporteOperativo/concentrado/{carril}/{fecha}")]
+        [HttpGet("Download/pdf/reporteOperativo/concentrado/{carril}/{fecha}/{cajero}/{turno}")]
         [Produces("application/pdf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DownloadReporteOperativoConcentrado(string? carril, string? fecha)
+        public async Task<IActionResult> DownloadReporteOperativoConcentrado(string? carril, string? fecha, string? cajero, string? turno)
         {
             carril = GetNullableString(carril);
             fecha = GetNullableString(fecha);
+            cajero = GetNullableString(cajero);
+            turno = GetNullableString(turno);
 
             string patternDia = @"(19|20)\d\d[-/.](0[1-9]|1[012])[-/.](0[1-9]|[1][0-9]|[2][0-9]|3[01])";
 
@@ -872,8 +889,21 @@ namespace ApiGateway.Controllers
                     return BadRequest("La fecha se encuentra en un formato incorrecto");
                 }
             }
+            int turnoI = 0;
 
-            var result = await _ferromexService.DownloadReporteOperativoConcentradoAsync(carril, fecha); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
+            if (!string.IsNullOrWhiteSpace(turno)) //Se comprueba si lo que se obtuvo no es un espacio en blanco
+            {
+                try
+                {
+                    turnoI = Convert.ToInt16(turno); //Si no es un espacio en blanco se guarda lo obteniedo en una variable de tipo int
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
+                }
+            }
+
+            var result = await _ferromexService.DownloadReporteOperativoConcentradoAsync(carril, fecha, cajero, turno); //Se llama al metodo asincrono de la interfaz, obteniendo el resultado del microServicio
 
             if (!result.Succeeded) //Se verifica que lo obtenido por el metodo no es nullo o erroneo a lo deseado
             {
@@ -1171,13 +1201,13 @@ namespace ApiGateway.Controllers
             var res = await _ferromexService.GetTurnosAsync(fechaDt);
             if (res != null)
             {
-                List<Turnos> turnos = new();
-                foreach (var turno in res.Content)
-                {
-                    if (turno.HasValue)
-                        turnos.Add(new(turno.ToString()));
-                }
-                if (turnos.Count > 0) return Ok(turnos);
+                //List<Turnos> turnos = new();
+                //foreach (var turno in res.Content)
+                //{
+                //    if (turno.HasValue)
+                //        turnos.Add(new(turno.ToString()));
+                //}
+                return Ok(res);
                 return NotFound();
             }
             return BadRequest();

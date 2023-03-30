@@ -127,13 +127,13 @@ namespace ApiGateway.Services
             return await GetAsync<List<TypeClass>>(path: "class");
         }
 
-        public async Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date)
+        public async Task<ApiResponse<Turno>> GetTurnosAsync(DateTime date)
         {
             Dictionary<string, string> parameters = new()
             {
                 { "fecha", date.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'") }
             };
-            return await GetAsync<int?[]>(path: "turnos", parameters: parameters);
+            return await GetAsync<Turno>(path: "turnos", parameters: parameters);
         }
 
         public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase)
@@ -363,7 +363,7 @@ namespace ApiGateway.Services
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesCajero");
         }
 
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoDeatelleAsync(string? carril, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoDeatelleAsync(string? carril, string? fecha, string? cajero, string? turno)
         {
             Dictionary<string, string> parameters = new();
 
@@ -374,6 +374,14 @@ namespace ApiGateway.Services
             if (!string.IsNullOrEmpty(fecha))
             {
                 parameters.Add("fecha", fecha);
+            }
+            if (!string.IsNullOrEmpty(cajero))
+            {
+                parameters.Add("cajero", cajero);
+            }
+            if (!string.IsNullOrEmpty(turno))
+            {
+                parameters.Add("turno", turno);
             }
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
@@ -412,7 +420,7 @@ namespace ApiGateway.Services
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/TransaccionesTurno");
         }
 
-        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoConcentradoAsync(string? carril, string? fecha)
+        public async Task<ApiResponse<byte[]>> DownloadReporteOperativoConcentradoAsync(string? carril, string? fecha, string? cajero, string? turno)
         {
             Dictionary<string, string> parameters = new();
 
@@ -423,6 +431,14 @@ namespace ApiGateway.Services
             if (!string.IsNullOrEmpty(fecha))
             {
                 parameters.Add("fecha", fecha);
+            }
+            if (!string.IsNullOrEmpty(cajero))
+            {
+                parameters.Add("cajero", cajero);
+            }
+            if (!string.IsNullOrEmpty(turno))
+            {
+                parameters.Add("turno", turno);
             }
 
             return await GetAsync<byte[]>(parameters: parameters, path: "/Reportes/ConcentradoTurno");

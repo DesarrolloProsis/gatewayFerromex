@@ -25,8 +25,8 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroConcentradoAsync(int? IdBolsa);
         Task<ApiResponse<byte[]>> DownloadReporteOperativoCajeroTransaccionesAsync(int? IdBolsa);
 
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoDeatelleAsync(string? carril, string? fecha);
-        Task<ApiResponse<byte[]>> DownloadReporteOperativoConcentradoAsync(string? carril, string? fecha);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoDeatelleAsync(string? carril, string? fecha, string? cajero, string? turno);
+        Task<ApiResponse<byte[]>> DownloadReporteOperativoConcentradoAsync(string? carril, string? fecha, string? cajero, string? turno);
 
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoConcentradoAsync(int? turno, string? fecha);
         Task<ApiResponse<byte[]>> DownloadReporteOperativoTurnoTransaccionesAsync(int? turno, string? fecha);
@@ -37,7 +37,7 @@ namespace ApiGateway.Interfaces
         Task<ApiResponse<List<TypeClass>>> GetClassAsync();
         Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase);
         Task<ApiResponse<int>> GetTransactionsCountAsync(string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase);
-        Task<ApiResponse<int?[]>> GetTurnosAsync(DateTime date);
+        Task<ApiResponse<Turno>> GetTurnosAsync(DateTime date);
 
         Task<ApiResponse<List<Viapasstags>>> GetTagsOrTagAsync(string? tag);
         Task<ApiResponse<List<ActividadUsuarios>>> GetActividadUsuariosAsync(int? paginaActual, int? numeroDeFilas, string? dia, string? semana, string? mes, string? nombre, string? rol, string? accion);
