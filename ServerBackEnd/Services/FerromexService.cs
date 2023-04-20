@@ -127,13 +127,13 @@ namespace ApiGateway.Services
             return await GetAsync<List<TypeClass>>(path: "class");
         }
 
-        public async Task<ApiResponse<Turno>> GetTurnosAsync(DateTime date)
+        public async Task<ApiResponse<List<Turno>>> GetTurnosAsync(DateTime date)
         {
             Dictionary<string, string> parameters = new()
             {
                 { "fecha", date.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'") }
             };
-            return await GetAsync<Turno>(path: "turnos", parameters: parameters);
+            return await GetAsync<List<Turno>>(path: "turnos", parameters: parameters);
         }
 
         public async Task<ApiResponse<List<Cruce>>> GetTransactionsAsync(int? paginaActual, int? numeroDeFilas, string? tag, string? carril, string? cuerpo, DateTime? fecha, string? noDePlaca, string? noEconomico, string? clase)
